@@ -2,7 +2,10 @@ require("dotenv").config({ override: true });
 const mongoose = require("mongoose");
 const app = require("./app");
 
-// Connect to the database
+// Use the PORT provided by Cloud Run, or default to 8080 locally
+const PORT = process.env.PORT || 8080;
+
+// Connect to MongoDB
 mongoose
   .connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
@@ -11,14 +14,12 @@ mongoose
   .then(() => {
     console.log("Connected to database:", mongoose.connection.name);
 
-    // Start the server
-    const PORT = process.env.PORT || 8080; 
-    app.listen(PORT, '0.0.0.0', () => {
-      console.log(`Server listening on port ${PORT}`);
+    // Start the Express server
+    app.listen(PORT, "0.0.0.0", () => {
+      console.log(`Server is running on port ${PORT}`);
     });
-    
   })
   .catch((err) => {
-    console.error("Database connection failed:", err);
-    process.exit(1);
+    console.error("Failed to connect to database:", err);
+    process.exit(1); // Exit if database connection fails
   });
