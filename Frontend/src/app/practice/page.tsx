@@ -20,8 +20,8 @@ interface QuestionData {
 
 function LatexQuestion({ question }: { question: string }) {
   return (
-    <div className='text-lg mb-4 overflow-x-auto p-4'>
-      <MathJax>{`\$$${question}\$$`}</MathJax>
+    <div className="text-lg mb-4 overflow-x-auto p-4">
+      <MathJax>{`$$${question}$$`}</MathJax>
     </div>
   );
 }
@@ -38,7 +38,9 @@ export default function PracticePage() {
     const loadQuestions = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch("https://backend-839795182838.us-central1.run.app/api/v1/questions");
+        const response = await fetch(
+          "https://backend-839795182838.us-central1.run.app/api/v1/questions"
+        );
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -62,53 +64,44 @@ export default function PracticePage() {
     loadQuestions();
   }, []);
 
-  // const handleSubmit = () => {
-  //   localStorage.setItem("currentQuestionIndex", currentQuestionIndex.toString());
-  //   router.push("/feedback");
-  // };
   const handleSubmit = async () => {
-    // Reference to the Canvas component
-    const canvasElement = document.querySelector('canvas');
-  
+    const canvasElement = document.querySelector("canvas");
+
     if (canvasElement) {
-      // Convert the canvas content to a Blob
       canvasElement.toBlob(async (blob) => {
         if (blob) {
           const formData = new FormData();
-          console.log(currentQuestionIndex);
-          
-          formData.append('file', blob, `${questions[currentQuestionIndex]._id}.png`); // Append the Blob as a file
-  
+          formData.append("file", blob, `${questions[currentQuestionIndex]._id}.png`);
+
           try {
-            // Send the canvas image to the backend
-            const response = await fetch('https://backend-839795182838.us-central1.run.app/api/v1/upload/image', {
-              method: 'POST',
-              body: formData,
-            });
-  
+            const response = await fetch(
+              "https://backend-839795182838.us-central1.run.app/api/v1/upload/image",
+              {
+                method: "POST",
+                body: formData,
+              }
+            );
+
             const data = await response.json();
-  
+
             if (response.ok) {
-              console.log('Image uploaded successfully:', data.publicUrl);
-              // Store the current question index
-              localStorage.setItem('currentQuestionIndex', currentQuestionIndex.toString());
-              // Redirect to feedback page
-              router.push('/feedback');
+              console.log("Image uploaded successfully:", data.publicUrl);
+              localStorage.setItem("currentQuestionIndex", currentQuestionIndex.toString());
+              router.push("/feedback");
             } else {
-              console.error('Failed to upload image:', data.message || 'Unknown error');
+              console.error("Failed to upload image:", data.message || "Unknown error");
             }
           } catch (error) {
-            console.error('Error uploading image:', error);
+            console.error("Error uploading image:", error);
           }
         } else {
-          console.error('Failed to retrieve canvas content.');
+          console.error("Failed to retrieve canvas content.");
         }
-      }, 'image/png');
+      }, "image/png");
     } else {
-      console.error('Canvas element not found.');
+      console.error("Canvas element not found.");
     }
   };
-  
 
   const handleNextQuestion = () => {
     setCurrentQuestionIndex((prevIndex) => {
@@ -127,43 +120,40 @@ export default function PracticePage() {
   };
 
   if (isLoading) {
-    return (
-      <div className='min-h-screen flex items-center justify-center'>Loading questions...</div>
-    );
+    return <div className="min-h-screen flex items-center justify-center">Loading questions...</div>;
   }
 
   if (error) {
     return (
-      <div className='min-h-screen flex items-center justify-center text-red-500'>{error}</div>
+      <div className="min-h-screen flex items-center justify-center text-red-500">{error}</div>
     );
   }
 
   return (
     <MathJaxContext>
-      <div className='min-h-screen bg-gray-100 flex flex-col'>
-      <LearnerHeader />
-        <div className='flex-grow p-8'>
-          <div className='max-w-4xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden'>
+      <div className="min-h-screen bg-gray-100 flex flex-col">
+        <LearnerHeader />
+        <div className="flex-grow p-8">
+          <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
             <PracticePageSubheader />
-
-            <div className='p-6'>
+            <div className="p-6">
               <ModeToggle mode={mode} setMode={setMode} />
-
               {questions.length > 0 && (
-                <LatexQuestion question={questions[currentQuestionIndex].question} />
+                <LatexQuestion
+                  key={currentQuestionIndex} // Force re-render of LatexQuestion
+                  question={questions[currentQuestionIndex].question}
+                />
               )}
-
               <QuestionNavigation
                 onPreviousQuestion={handlePreviousQuestion}
                 onNextQuestion={handleNextQuestion}
               />
-                <Canvas />
-              </div>
-              <br />
-              <SubmitButton onClick={handleSubmit} />
+              <Canvas />
+            </div>
+            <br />
+            <SubmitButton onClick={handleSubmit} />
           </div>
         </div>
-
         <Footer />
       </div>
     </MathJaxContext>
