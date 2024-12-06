@@ -1,15 +1,20 @@
-FROM node:18-alpine AS builder
-WORKDIR /usr/src/app
-COPY package*.json ./
-RUN npm install
-COPY . .
-# RUN npm run build if necessary
+# Use Node.js as the base image
+FROM node:18-alpine
 
-FROM node:18-alpine AS runner
-WORKDIR /usr/src/app
-ENV NODE_ENV=production
+# Set the working directory
+WORKDIR /app
+
+# Copy package.json and package-lock.json
 COPY package*.json ./
-RUN npm install --omit=dev
-COPY --from=builder /usr/src/app ./
+
+# Install dependencies
+RUN npm ci
+
+# Copy the application code
+COPY . .
+
+# Expose port 8080
 EXPOSE 8080
-CMD ["npm", "start"]
+
+# Start the application
+CMD ["node", "server.js"]

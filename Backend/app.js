@@ -23,28 +23,43 @@ const app = express();
 // middlewares
 app.use(helmet());
 
-if (process.env.NODE_ENV !== "production") {
-  app.use(morgan("dev"));
-  app.use(cors({ credentials: true, origin: `http://localhost:3001` }));
-} else {
+if (process.env.NODE_ENV === "production") {
+  app.set("trust proxy", 1); // Trust proxy headers in production (e.g., for HTTPS)
+
   const limiter = rateLimit({
-    max: 100,
-    windowMs: 60 * 60 * 1000,
+    max: 100, // Maximum number of requests per hour
+    windowMs: 60 * 60 * 1000, // 1 hour
     message: "Too many requests from this IP, please try again in an hour",
   });
   app.use("/api", limiter);
+} else {
+  app.use(cors({ credentials: true, origin: `http://localhost:3001` }));
+  app.use(morgan("dev"));
 }
+
 app.use(compression());
 app.use(express.json());
 
 // Session middleware
+const MongoStore = require("connect-mongo");
+
 app.use(
   session({
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
+    store: MongoStore.create({
+      mongoUrl: process.env.MONGO_URI, // Use your MongoDB URI
+      collectionName: "sessions", // Optional: Name of the collection to store sessions
+    }),
+    cookie: {
+      maxAge: 1000 * 60 * 60 * 24, // 1 day
+      secure: process.env.NODE_ENV === "production", // Use HTTPS in production
+      httpOnly: true,
+    },
   })
 );
+
 
 // Passport middleware
 app.use(passport.initialize());
