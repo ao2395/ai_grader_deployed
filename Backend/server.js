@@ -1,20 +1,33 @@
 require("dotenv").config({ override: true });
 const mongoose = require("mongoose");
-
-const express = require("express");
-
 const app = require("./app");
 
-// connect to database
+// Connect to database
 mongoose
-  .connect(process.env.MONGO_URI)
+  .connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
   .then(() => {
-    // listen for requests
-    app.listen(process.env.PORT, () => {
-      console.log("Connected to database...", mongoose.connection.name);
-      console.log(`Listening on port ${process.env.PORT}...`);
+    console.log("Connected to database:", mongoose.connection.name);
+
+    const server = app.listen(process.env.PORT || 8080, () => {
+      console.log(`Listening on port ${process.env.PORT || 8080}...`);
     });
+
+    // Graceful shutdown
+    const shutdown = async () => {
+      console.log("\nShutting down gracefully...");
+      server.close(() => console.log("Server closed."));
+      await mongoose.connection.close();
+      console.log("Disconnected from database.");
+      process.exit(0);
+    };
+
+    process.on("SIGINT", shutdown);
+    process.on("SIGTERM", shutdown);
   })
   .catch((err) => {
-    console.log(err);
+    console.error("Database connection failed:", err);
+    process.exit(1);
   });
