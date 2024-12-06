@@ -25,7 +25,7 @@ app.use(helmet());
 
 if (process.env.NODE_ENV !== "production") {
   app.use(morgan("dev"));
-  app.use(cors({ credentials: true, origin: `http://localhost:3001` }));
+  app.use(cors({ credentials: true, origin: `https://frontend-839795182838.us-central1.run.app` }));
 } else {
   const limiter = rateLimit({
     max: 100,
