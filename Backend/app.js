@@ -23,7 +23,7 @@ const app = express();
 // middlewares
 app.use(helmet());
 
-if (process.env.NODE_ENV !== "production") {
+if (process.env.NODE_ENV !== "development") {
   app.use(morgan("dev"));
   app.use(cors({ credentials: true, origin: `https://frontend-839795182838.us-central1.run.app` }));
 } else {
