@@ -11,5 +11,5 @@ ENV NODE_ENV=production
 COPY package*.json ./
 RUN npm install --omit=dev
 COPY --from=builder /usr/src/app ./
-EXPOSE 8080
+EXPOSE 3000
 CMD ["npm", "start"]

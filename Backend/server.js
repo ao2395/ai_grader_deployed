@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const app = require("./app");
 
 // Use the PORT provided by Cloud Run, or default to 8080 locally
-const PORT = process.env.PORTS || 8080;
+const PORT = process.env.PORT || 8080;
 
 // Connect to MongoDB
 mongoose
