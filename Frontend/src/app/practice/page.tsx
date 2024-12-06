@@ -38,7 +38,7 @@ export default function PracticePage() {
     const loadQuestions = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch("http://localhost:3000/api/v1/questions");
+        const response = await fetch("https://backend-839795182838.us-central1.run.app/api/v1/questions");
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -81,7 +81,7 @@ export default function PracticePage() {
   
           try {
             // Send the canvas image to the backend
-            const response = await fetch('http://localhost:3000/api/v1/upload/image', {
+            const response = await fetch('https://backend-839795182838.us-central1.run.app/api/v1/upload/image', {
               method: 'POST',
               body: formData,
             });

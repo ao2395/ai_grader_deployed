@@ -195,7 +195,7 @@ export default function Canvas() {
       formData.append('file', audioBlob, `${timestamp}_nopw___tryryryrecorded_audio.wav`);
   
       try {
-        const response = await fetch('http://localhost:3000/api/v1/upload/audio', {
+        const response = await fetch('https://backend-839795182838.us-central1.run.app/api/v1/upload/audio', {
           method: 'POST',
           body: formData,
         });
@@ -241,7 +241,7 @@ export default function Canvas() {
       formData.append('file', canvasBlob, 'c333anvasImage.png');
   
       try {
-        const response = await fetch('http://localhost:3000/api/v1/upload/image', {
+        const response = await fetch('https://backend-839795182838.us-central1.run.app/api/v1/upload/image', {
           method: 'POST',
           body: formData,
         });

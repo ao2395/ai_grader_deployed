@@ -9,7 +9,7 @@ authRouter.get(
   "/google/callback",
   passport.authenticate("google", { failureRedirect: "/login" }),
   function (req, res) {
-    res.redirect(`http://localhost:3001/login?userId=${req.user._id}`);
+    res.redirect(`https://frontend-839795182838.us-central1.run.app/login?userId=${req.user._id}`);
   }
 );
 
@@ -22,7 +22,7 @@ authRouter.get("/logout", (req, res) => {
     if (err) {
       return next(err);
     }
-    res.redirect("http://localhost:3001/");
+    res.redirect("https://frontend-839795182838.us-central1.run.app/");
   });
 });
 

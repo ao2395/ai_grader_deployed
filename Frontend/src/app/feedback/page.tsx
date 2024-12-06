@@ -47,7 +47,7 @@ export default function FeedbackPage() {
 
   const saveResponse = async (feedbackData: FeedbackData, questionId: string, userId: string) => {
     try {
-      const response = await fetch("http://localhost:3000/api/v1/responses", {
+      const response = await fetch("https://backend-839795182838.us-central1.run.app/api/v1/responses", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

@@ -41,7 +41,7 @@ export default function SignUp() {
                 <Button
                   onClick={() =>
                     (window.location.href =
-                      "http://localhost:3000/api/v1/auth/google")
+                      "https://backend-839795182838.us-central1.run.app/api/v1/auth/google")
                   }
                   className="w-full flex justify-center items-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
                 >
