@@ -2,7 +2,7 @@
 FROM node:20-alpine
 
 # Set the working directory inside the container
-WORKDIR /server
+WORKDIR /app
 
 # Copy only package files to leverage Docker caching
 COPY package*.json ./
