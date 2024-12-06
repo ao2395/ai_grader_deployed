@@ -12,10 +12,11 @@ mongoose
     console.log("Connected to database:", mongoose.connection.name);
 
     // Start the server
-    const PORT = process.env.PORT || 8080; // Use the Cloud Run PORT variable or default to 8080
-    app.listen(PORT, () => {
-      console.log(`Listening on port ${PORT}...`);
+    const PORT = process.env.PORT || 8080; 
+    app.listen(PORT, '0.0.0.0', () => {
+      console.log(`Server listening on port ${PORT}`);
     });
+    
   })
   .catch((err) => {
     console.error("Database connection failed:", err);
