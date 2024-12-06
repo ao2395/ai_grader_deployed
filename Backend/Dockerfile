@@ -1,15 +1,20 @@
-FROM node:18-alpine AS builder
-WORKDIR /usr/src/app
-COPY package*.json ./
-RUN npm install
-COPY . .
-# RUN npm run build if necessary
+# Use an official Node.js image as the base image
+FROM node:18-alpine
 
-FROM node:18-alpine AS runner
-WORKDIR /usr/src/app
-ENV NODE_ENV=production
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy only package files to leverage Docker caching
 COPY package*.json ./
-RUN npm install --omit=dev
-COPY --from=builder /usr/src/app ./
-EXPOSE 3000
+
+# Install dependencies (use `ci` for stricter installs)
+RUN npm ci
+
+# Copy the rest of the application code
+COPY . .
+
+# Expose the port the app will run on (documenting it for clarity)
+EXPOSE 8080
+
+# Set the command to start the application
 CMD ["npm", "start"]
