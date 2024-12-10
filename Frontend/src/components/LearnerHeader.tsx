@@ -3,15 +3,17 @@
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import Cookies from "js-cookie";
 
 export default function LearnerHeader() {
   const router = useRouter();
 
   const handleLogout = () => {
-    // Remove all user-related information from localStorage
-    localStorage.removeItem("token");
-    localStorage.removeItem("userId");
-    localStorage.removeItem("currentQuestionIndex");
+    // Remove all user-related cookies
+    Cookies.remove("token");
+    Cookies.remove("userId");
+    Cookies.remove("currentQuestionIndex"); // If this is stored in cookies as well
+  
     // Redirect to the home page
     router.push("/");
   };

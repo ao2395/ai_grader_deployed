@@ -40,8 +40,8 @@ export default function SignupPage() {
 
       if (response.ok) {
         // Set the token in cookies with a 7-day expiration
-        Cookies.set("token", data.token, { expires: 7, secure: true, sameSite: "strict" });
-        Cookies.set("userId", data.user.id, { expires: 7, secure: true, sameSite: "strict" });
+        Cookies.set("token", data.token, { expires: 7, secure: true, sameSite: "lax" });
+        Cookies.set("userId", data.user.id, { expires: 7, secure: true, sameSite: "lax" });
 
         router.push("/learner-home");
       } else {
