@@ -1,6 +1,8 @@
+"use client";
+
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import Button from "./Button"; // Assuming Button component exists in the project
+import { Button } from "@/components/ui/button";
 
 export default function LearnerHeader() {
   const router = useRouter();
