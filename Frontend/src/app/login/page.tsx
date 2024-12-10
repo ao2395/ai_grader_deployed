@@ -4,6 +4,7 @@ import { useState, Suspense } from "react";
 import { useRouter } from "next/navigation";
 import { FcGoogle } from "react-icons/fc";
 import useGoogleOAuth from "./LoginClient";
+import { log } from "console";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -37,6 +38,7 @@ export default function LoginPage() {
       } else {
         setError(data.message || "Login failed");
       }
+      console.log(data.token);
     } catch (error) {
       console.error("Login error:", error);
       setError("An error occurred during login");
