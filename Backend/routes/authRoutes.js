@@ -9,7 +9,9 @@ authRouter.get(
   "/google/callback",
   passport.authenticate("google", { failureRedirect: "/login" }),
   function (req, res) {
-    res.redirect(`https://frontend-839795182838.us-central1.run.app/login?userId=${req.user._id}`);
+    // Set session cookie
+    req.session.userId = req.user._id;
+    res.redirect(`https://frontend-839795182838.us-central1.run.app/learner-home`);
   }
 );
 

@@ -41,6 +41,7 @@ const registerUser = async (req, res) => {
           .status(500)
           .json({ message: "Error logging in after registration", error: loginError.message });
       }
+      req.session.userId = user.id;
       res.status(201).json({
         message: "User registered successfully",
         user: { id: user.id, name: user.name, email: user.email },
@@ -75,6 +76,7 @@ const loginUser = async (req, res, next) => {
       if (err) {
         return next(err);
       }
+      req.session.userId = user.id;
       return res.json({
         message: "Logged in successfully",
         user: { id: user.id, name: user.name, email: user.email },
