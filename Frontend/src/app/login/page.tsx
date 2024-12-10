@@ -38,7 +38,6 @@ export default function LoginPage() {
       } else {
         setError(data.message || "Login failed");
       }
-      console.log(data.token);
     } catch (error) {
       console.error("Login error:", error);
       setError("An error occurred during login");
