@@ -33,6 +33,7 @@ export const config = {
     "/learner-home",
     "/practice",
     "/dashboard",
+    "/feedback",
     "/((?!api|_next/static|_next/image|favicon.ico).*)",
   ],
 };

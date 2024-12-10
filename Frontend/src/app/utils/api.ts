@@ -37,7 +37,7 @@ export async function authenticatedFetch(
       if (response.status === 401 && typeof window !== "undefined") {
         // Client-side: Handle unauthorized response
         document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-        window.location.href = "/login";
+        window.location.href = "/signup";
         throw new Error("Unauthorized");
       }
       throw new Error(`HTTP error! status: ${response.status}`);

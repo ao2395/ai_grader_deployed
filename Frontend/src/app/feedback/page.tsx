@@ -111,7 +111,6 @@ export default function FeedbackPage() {
             `https://backend-839795182838.us-central1.run.app/api/v1/submit`,
             {
               method: "POST",
-              headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
                 questionId: currentQuestion._id,
                 userId: storedUserId,
