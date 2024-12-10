@@ -99,7 +99,7 @@ async function gradeSubmission(imagePath, transcription, question, officialAnswe
 
     // Now parse the cleaned content as JSON
     const feedbackObject = JSON.parse(cleanedContent);
-
+    //hrereeeeeeee
     return feedbackObject;
   } catch (error) {
     console.error("An error occurred during grading:", error);
@@ -107,62 +107,64 @@ async function gradeSubmission(imagePath, transcription, question, officialAnswe
   }
 }
 
-//   async function processSubmission(imagePath, audioPath, question, officialAnswer) {
-//     try {
-//       // Step 1: Transcribe the audio
-//       const transcription = await transcribeAudio(audioPath);
-
-//       // Step 2: Grade the submission
-//       const feedback = await gradeSubmission(imagePath, transcription, question, officialAnswer);
-
-//       console.log("Grading Feedback:");
-//       console.log(JSON.stringify(feedback, null, 2));
-
-//       // Here you can save the feedback object directly to your database
-//       return feedback;
-//     } catch (error) {
-//       console.error("An error occurred during submission processing:", error);
-//       throw error;
-//     }
-//   }
-
-//   // Usage
-//   // Retrive the things below from mongo db
-//   const imagePath = '/Users/irfank/Downloads/testvideodomainlastframe.png';
-//   const audioPath = '/Users/irfank/Downloads/domainvideo.mp3';
-
-//   const question = "Find the domain of the function: f(x) = x^4 / (x^2 + x - 42)";
-//   const officialAnswer = "(-∞, -7) ∪ (-7, 6) ∪ (6, ∞)";
-
-//   processSubmission(imagePath, audioPath, question, officialAnswer)
-// .then(feedback => {
-//       // feedback object will have the structure:
-//       // {
-//       //   grade: "A-",
-//       //   writtenFeedback: "The solution is correct and well-presented...",
-//       //   spokenFeedback: "The verbal explanation was clear and demonstrated good understanding..."
-//       // }
-
-//       // Save to database or send response to client
-//     })
-//     .catch(error => {
-//       // Handle any errors
-//     });
-
 const questionController = require("./questionController");
 const responseController = require("./responseController");
 // const fs = require('fs');
 const path = require("path");
 const { Storage } = require("@google-cloud/storage");
 
-const storage = new Storage({
-  keyFilename: "/Users/irfank/Downloads/ppds-f-24-470a0a2126e6.json",
-});
+// const storage = new Storage({
+//   keyFilename: "/Users/irfank/Downloads/ppds-f-24-470a0a2126e6.json",
+// });
+const storage = new Storage({credentials: JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON)});
 
-// Function to list files in the GCS bucket
+// // Function to list files in the GCS bucket
+// async function listFilesInBucket(bucketName) {
+//   const [files] = await storage.bucket(bucketName).getFiles();
+//   return files.map((file) => file.name); // Return the filenames
+// }
+
+async function deleteAllFilesfromRoot() {
+  const bucketName = 'ai-grader-storage';
+  const bucket = storage.bucket(bucketName);
+  const directoryToSkip = 'future_research_storage/';
+
+  try {
+    const [files] = await bucket.getFiles();
+    console.log(`Found ${files.length} files in bucket ${bucketName}.`);
+
+    for (const file of files) {
+      // Skip the specified directory and its contents
+      if (file.name.startsWith(directoryToSkip)) {
+        console.log(`Skipping deletion of file in protected directory: ${file.name}`);
+        continue;
+      }
+
+      try {
+        await file.delete();
+        console.log(`Deleted file: ${file.name}`);
+      } catch (error) {
+        console.error(`Error deleting file ${file.name}:`, error);
+      }
+    }
+
+    console.log('File deletion completed (protected directory preserved).');
+  } catch (error) {
+    console.error('Error listing or deleting files:', error);
+  }
+}
+
+// Function to list files in the GCS bucket (only root files)
 async function listFilesInBucket(bucketName) {
   const [files] = await storage.bucket(bucketName).getFiles();
-  return files.map((file) => file.name); // Return the filenames
+  
+  // Filter out the future_research_storage directory and its contents
+  const rootFiles = files.filter(file => {
+    return !file.name.startsWith('future_research_storage/') && 
+           !file.name.endsWith('/');  // Exclude directory markers
+  });
+  
+  return rootFiles.map(file => file.name);
 }
 
 // Function to download a file from GCS and assign a name based on its extension
@@ -186,12 +188,14 @@ async function processSubmission(bucketName) {
     // Step 1: List files in the GCS bucket
     const filenames = await listFilesInBucket(bucketName);
 
+
     if (filenames.length !== 2) {
       throw new Error(`Expected 2 files in the bucket, found ${filenames.length}`);
     }
 
     function stripExtension(filename) {
-      return filename.split(".").slice(0, -1).join(".");
+      //return filename.split(".").slice(0, -1).join(".");
+      return filename.split("_")[0];
     }
 
     // Step 2: Identify image and audio files based on their extensions
@@ -253,6 +257,9 @@ async function processSubmission(bucketName) {
     // Optionally clean up downloaded files
     // fs.unlinkSync(imagePath);
     // fs.unlinkSync(audioPath);
+    ////HHEEHHRHRHHEHHE
+
+    await deleteAllFilesfromRoot();
 
     return feedback;
   } catch (error) {

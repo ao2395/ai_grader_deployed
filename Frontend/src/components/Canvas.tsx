@@ -170,6 +170,69 @@ export default function Canvas() {
     URL.revokeObjectURL(url);
   };
 
+  const saveAudio = async () => {
+    if (audioChunksRef.current.length > 0) {
+      const audioBlob = new Blob(audioChunksRef.current, { type: "audio/wav" });
+  
+      const formData1 = new FormData();
+      const formData2 = new FormData();
+      
+      const currentDate = new Date();
+      const formattedDate = currentDate.toISOString().split('T')[0];
+      const formattedTime = currentDate.toTimeString().split(' ')[0].replace(/:/g, '');
+      const fileName = `recorded_audio_${formattedDate}_${formattedTime}.wav`;
+
+      
+      
+      // Append the same file to both FormData objects
+      formData1.append("file", audioBlob, fileName);
+      formData2.append("file", audioBlob, fileName);
+  
+      try {
+        // Upload to both storages in parallel
+        const [regularUpload, researchUpload] = await Promise.all([
+          authenticatedFetch(
+            "https://backend-839795182838.us-central1.run.app/api/v1/upload/audio",
+            {
+              method: "POST",
+              body: formData1,
+            }
+          ),
+          authenticatedFetch(
+            "https://backend-839795182838.us-central1.run.app/api/v1/upload/research/audio",
+            {
+              method: "POST",
+              body: formData2,
+            }
+          )
+        ]);
+  
+        // Download the file locally
+        downloadFile(audioBlob, "recorded_audio.wav");
+  
+        // Parse both responses
+        const [regularData, researchData] = await Promise.all([
+          regularUpload.json(),
+          researchUpload.json()
+        ]);
+  
+        if (regularUpload.ok && researchUpload.ok) {
+          console.log("Regular upload successful:", regularData.publicUrl);
+          console.log("Research upload successful:", researchData.publicUrl);
+        } else {
+          console.error("Failed to upload to one or more locations:", {
+            regular: regularUpload.ok ? "Success" : "Failed",
+            research: researchUpload.ok ? "Success" : "Failed"
+          });
+        }
+      } catch (error) {
+        console.error("Error uploading audio:", error);
+      }
+    } else {
+      console.log("No audio recorded yet");
+    }
+  };
+
   // const downloadImage = () => {
   //   if (!canvasRef.current) return;
 
@@ -189,37 +252,37 @@ export default function Canvas() {
   //   }
   // };
 
-  const saveAudio = async () => {
-    if (audioChunksRef.current.length > 0) {
-      const audioBlob = new Blob(audioChunksRef.current, { type: "audio/wav" });
+  // const saveAudio = async () => {
+  //   if (audioChunksRef.current.length > 0) {
+  //     const audioBlob = new Blob(audioChunksRef.current, { type: "audio/wav" });
 
-      const formData = new FormData();
-      const timestamp = Date.now();
-      formData.append("file", audioBlob, `${timestamp}_nopw___tryryryrecorded_audio.wav`);
+  //     const formData = new FormData();
+  //     const timestamp = Date.now();
+  //     formData.append("file", audioBlob, `${timestamp}_nopw___tryryryrecorded_audio.wav`);
 
-      try {
-        const response = await authenticatedFetch(
-          "https://backend-839795182838.us-central1.run.app/api/v1/upload/audio",
-          {
-            method: "POST",
-            body: formData,
-          }
-        );
-        downloadFile(audioBlob, "recorded_audio.wav");
+  //     try {
+  //       const response = await authenticatedFetch(
+  //         "https://backend-839795182838.us-central1.run.app/api/v1/upload/audio",
+  //         {
+  //           method: "POST",
+  //           body: formData,
+  //         }
+  //       );
+  //       downloadFile(audioBlob, "recorded_audio.wav");
 
-        const data = await response.json();
-        if (response.ok) {
-          console.log("Audio uploaded successfully:", data.publicUrl);
-        } else {
-          console.error("Failed to upload audio:", data.message || "Unknown error");
-        }
-      } catch (error) {
-        console.error("Error uploading audio:", error);
-      }
-    } else {
-      console.log("No audio recorded yet");
-    }
-  };
+  //       const data = await response.json();
+  //       if (response.ok) {
+  //         console.log("Audio uploaded successfully:", data.publicUrl);
+  //       } else {
+  //         console.error("Failed to upload audio:", data.message || "Unknown error");
+  //       }
+  //     } catch (error) {
+  //       console.error("Error uploading audio:", error);
+  //     }
+  //   } else {
+  //     console.log("No audio recorded yet");
+  //   }
+  // };
 
   // const saveImage = () => {
   //   downloadImage();

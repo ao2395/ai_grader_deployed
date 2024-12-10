@@ -49,7 +49,7 @@ const path = require("path");
 
 // const router = express.Router();
 const storage = new Storage({
-  keyFilename: "/Users/irfank/Downloads/ppds-f-24-470a0a2126e6.json",
+  credentials: JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON)
 });
 const bucket = storage.bucket("ai-grader-storage");
 
