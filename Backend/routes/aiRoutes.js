@@ -1,9 +1,10 @@
 const express = require("express");
 const aiController = require("../controllers/aiController");
+const authMiddleware = require("../middleware/auth");
 const aiRouter = express.Router();
 const bucketName = "ai-grader-storage";
 
-aiRouter.post("/", async (req, res) => {
+aiRouter.post("/", authMiddleware, async (req, res) => {
   try {
     const feedback = await aiController.processSubmission(bucketName);
     res.status(201).json(feedback);
