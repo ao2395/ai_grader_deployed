@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { authenticatedFetch } from "@/app/utils/api";
 
 export default function SignupClient() {
   const [name, setName] = useState("");
@@ -10,16 +11,14 @@ export default function SignupClient() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const router = useRouter();
-  const searchParams = useSearchParams();
 
   useEffect(() => {
-    // Check if we have a userId from Google OAuth callback
-    const userId = searchParams.get("userId");
-    if (userId) {
-      // No need to set cookies manually, the server should have set the session
+    // Check if we have a token from Google OAuth callback
+    const token = localStorage.getItem("token");
+    if (token) {
       router.push("/learner-home");
     }
-  }, [router, searchParams]);
+  }, [router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,11 +30,10 @@ export default function SignupClient() {
     }
 
     try {
-      const response = await fetch(
+      const response = await authenticatedFetch(
         "https://backend-839795182838.us-central1.run.app/api/v1/auth/register",
         {
           method: "POST",
-          credentials: "include",
           headers: {
             "Content-Type": "application/json",
           },
@@ -44,7 +42,9 @@ export default function SignupClient() {
       );
 
       if (response.ok) {
-        // No need to set cookies manually, the server should have set the session
+        const data = await response.json();
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("userId", data.user.id);
         router.push("/learner-home");
       } else {
         const errorData = await response.json();
