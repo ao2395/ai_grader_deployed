@@ -19,20 +19,28 @@ export async function authenticatedFetch(
     token = typeof cookie === "string" ? cookie : cookie?.value;
   }
 
-  const headers = {
-    ...options.headers,
-    "Content-Type": "application/json",
-    ...(token && { Authorization: `Bearer ${token}` }),
-  };
+  const headers = new Headers(options.headers);
+
+  // Only set Content-Type to application/json if it's not a FormData object
+  if (!(options.body instanceof FormData)) {
+    headers.set("Content-Type", "application/json");
+  }
+
+  if (token) {
+    headers.set("Authorization", `Bearer ${token}`);
+  }
 
   try {
     const response = await fetch(url, { ...options, headers });
 
-    if (response.status === 401 && typeof window !== "undefined") {
-      // Client-side: Handle unauthorized response
-      document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-      window.location.href = "/login";
-      throw new Error("Unauthorized");
+    if (!response.ok) {
+      if (response.status === 401 && typeof window !== "undefined") {
+        // Client-side: Handle unauthorized response
+        document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        window.location.href = "/login";
+        throw new Error("Unauthorized");
+      }
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
 
     return response;
