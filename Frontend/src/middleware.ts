@@ -12,7 +12,7 @@ export function middleware(request: NextRequest) {
 
   // If the path is not public and there's no token, redirect to login
   if (!isPublicPath && !token) {
-    return NextResponse.redirect(new URL("/login", request.url));
+    return NextResponse.redirect(new URL("/signup", request.url));
   }
 
   // If the user has a token and tries to access login or signup, redirect to learner-home
