@@ -7,11 +7,11 @@ export function middleware(request: NextRequest) {
   // Define which paths are considered public (don't require authentication)
   const isPublicPath = path === "/login" || path === "/signup" || path === "/";
 
-  // Get the token from the cookies
-  const token = request.cookies.get("authToken")?.value;
+  // Check for session cookie
+  const sessionId = request.cookies.get("connect.sid")?.value;
 
   // If the path is not public and there's no token, redirect to signup
-  if (!isPublicPath && !token) {
+  if (!isPublicPath && !sessionId) {
     return NextResponse.redirect(new URL("/signup", request.url));
   }
 
