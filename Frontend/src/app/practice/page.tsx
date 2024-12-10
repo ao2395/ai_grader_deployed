@@ -32,6 +32,7 @@ export default function PracticePage() {
   const [questions, setQuestions] = useState<QuestionData[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [totalQuestions, setTotalQuestions] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
@@ -47,14 +48,20 @@ export default function PracticePage() {
         }
         const data = await response.json();
         setQuestions(data);
+        setTotalQuestions(data.length);
 
+        // const storedIndex = localStorage.getItem("currentQuestionIndex");
+        // if (storedIndex !== null) {
+        //   const parsedIndex = parseInt(storedIndex, 10);
+        //   if (!isNaN(parsedIndex) && parsedIndex >= 0 && parsedIndex < data.length) {
+        //     setCurrentQuestionIndex(parsedIndex);
+        //   }
+        // }
         const storedIndex = localStorage.getItem("currentQuestionIndex");
-        if (storedIndex !== null) {
-          const parsedIndex = parseInt(storedIndex, 10);
-          if (!isNaN(parsedIndex) && parsedIndex >= 0 && parsedIndex < data.length) {
-            setCurrentQuestionIndex(parsedIndex);
-          }
-        }
+        if (storedIndex === null) throw new Error("No question index found in localStorage");
+
+        const questionIndex = parseInt(storedIndex, 10);
+        const currentQuestion = data[questionIndex];
       } catch (error) {
         console.error("Error loading questions:", error);
         setError("Failed to load questions. Please try again later.");
@@ -65,25 +72,24 @@ export default function PracticePage() {
     loadQuestions();
   }, []);
 
-  
   const handleSubmit = async () => {
     const canvasElement = document.querySelector("canvas");
-  
+
     if (canvasElement) {
       canvasElement.toBlob(async (blob) => {
         if (blob) {
           const formData1 = new FormData();
           const formData2 = new FormData();
-          
+
           const currentDate = new Date();
-          const formattedDate = currentDate.toISOString().split('T')[0];
-          const formattedTime = currentDate.toTimeString().split(' ')[0].replace(/:/g, '');
+          const formattedDate = currentDate.toISOString().split("T")[0];
+          const formattedTime = currentDate.toTimeString().split(" ")[0].replace(/:/g, "");
           const fileName = `${questions[currentQuestionIndex]._id}_${formattedDate}_${formattedTime}.png`;
-          
+
           // Append the same file to both FormData objects
-          formData1.append('file', blob, fileName);
-          formData2.append('file', blob, fileName);
-  
+          formData1.append("file", blob, fileName);
+          formData2.append("file", blob, fileName);
+
           try {
             // Upload to both storages in parallel
             const [regularUpload, researchUpload] = await Promise.all([
@@ -100,15 +106,15 @@ export default function PracticePage() {
                   method: "POST",
                   body: formData2,
                 }
-              )
+              ),
             ]);
-  
+
             // Parse both responses
             const [regularData, researchData] = await Promise.all([
               regularUpload.json(),
-              researchUpload.json()
+              researchUpload.json(),
             ]);
-  
+
             if (regularUpload.ok && researchUpload.ok) {
               console.log("Regular upload successful:", regularData.publicUrl);
               console.log("Research upload successful:", researchData.publicUrl);
@@ -117,7 +123,7 @@ export default function PracticePage() {
             } else {
               console.error("Failed to upload to one or more locations:", {
                 regular: regularUpload.ok ? "Success" : "Failed",
-                research: researchUpload.ok ? "Success" : "Failed"
+                research: researchUpload.ok ? "Success" : "Failed",
               });
             }
           } catch (error) {
@@ -140,7 +146,7 @@ export default function PracticePage() {
   //       if (blob) {
   //         const formData1 = new FormData();
   //         const formData2 = new FormData();
-          
+
   //         const currentDate = new Date();
   //         const formattedDate = currentDate.toISOString().split('T')[0];
   //         const formattedTime = currentDate.toTimeString().split(' ')[0].replace(/:/g, '');
@@ -148,7 +154,7 @@ export default function PracticePage() {
   //         // Append the same file to both FormData objects
   //         formData1.append('file', blob, fileName);
   //         formData2.append('file', blob, fileName);
-          
+
   //         //formData.append("file", blob, `${questions[currentQuestionIndex]._id}.png`);
 
   //         try {
@@ -182,19 +188,26 @@ export default function PracticePage() {
   // };
 
   const handleNextQuestion = () => {
-    setCurrentQuestionIndex((prevIndex) => {
-      const nextIndex = prevIndex === questions.length - 1 ? 0 : prevIndex + 1;
-      localStorage.setItem("currentQuestionIndex", nextIndex.toString());
-      return nextIndex;
-    });
+    // setCurrentQuestionIndex((prevIndex) => {
+    //   const nextIndex = prevIndex === questions.length - 1 ? 0 : prevIndex + 1;
+    //   localStorage.setItem("currentQuestionIndex", nextIndex.toString());
+    //   return nextIndex;
+    // });
+    const currentIndex = parseInt(localStorage.getItem("currentQuestionIndex") || "0", 10);
+    const nextIndex = (currentIndex + 1) % totalQuestions;
+    localStorage.setItem("currentQuestionIndex", nextIndex.toString());
+    // router.push("/practice");
   };
 
   const handlePreviousQuestion = () => {
-    setCurrentQuestionIndex((prevIndex) => {
-      const newIndex = prevIndex === 0 ? questions.length - 1 : prevIndex - 1;
-      localStorage.setItem("currentQuestionIndex", newIndex.toString());
-      return newIndex;
-    });
+    // setCurrentQuestionIndex((prevIndex) => {
+    //   const newIndex = prevIndex === 0 ? questions.length - 1 : prevIndex - 1;
+    //   localStorage.setItem("currentQuestionIndex", newIndex.toString());
+    //   return newIndex;
+    // });
+    const currentIndex = parseInt(localStorage.getItem("currentQuestionIndex") || "0", 10);
+    const previousIndex = (currentIndex - 1 + totalQuestions) % totalQuestions;
+    localStorage.setItem("currentQuestionIndex", previousIndex.toString());
   };
 
   if (isLoading) {
