@@ -1,4 +1,4 @@
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 const useGoogleOAuth = () => {
@@ -6,27 +6,17 @@ const useGoogleOAuth = () => {
   const searchParams = new URLSearchParams(window.location.search);
 
   useEffect(() => {
-    // Check if we have a token from Google OAuth callback
-    const token = searchParams.get("token");
-    if (token) {
-      document.cookie = `authToken=${token}; path=/; secure; HttpOnly; SameSite=Strict`;
+    // Check if we have a userId from Google OAuth callback
+    const userId = searchParams.get("userId");
+    if (userId) {
+      // No need to set cookies manually, the server should have set the session
       router.push("/learner-home");
     }
   }, [router, searchParams]);
 
   const handleGoogleLogin = async () => {
     try {
-      const response = await fetch(
-        "https://backend-839795182838.us-central1.run.app//api/v1/auth/google",
-        {
-          credentials: "include",
-        }
-      );
-      const data = await response.json();
-      // Set a secure, HTTP-only cookie instead of using localStorage
-      document.cookie = `authToken=${data.token}; path=/; secure; HttpOnly; SameSite=Strict`;
-
-      router.push("/learner-home");
+      window.location.href = "https://backend-839795182838.us-central1.run.app/api/v1/auth/google";
     } catch (error) {
       console.error("Error during Google login:", error);
     }

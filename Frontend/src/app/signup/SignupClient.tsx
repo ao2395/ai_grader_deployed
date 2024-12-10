@@ -16,7 +16,7 @@ export default function SignupClient() {
     // Check if we have a userId from Google OAuth callback
     const userId = searchParams.get("userId");
     if (userId) {
-      document.cookie = `authToken=${userId}; path=/; secure; HttpOnly; SameSite=Strict`;
+      // No need to set cookies manually, the server should have set the session
       router.push("/learner-home");
     }
   }, [router, searchParams]);
@@ -44,8 +44,7 @@ export default function SignupClient() {
       );
 
       if (response.ok) {
-        const data = await response.json();
-        document.cookie = `authToken=${data.token}; path=/; secure; HttpOnly; SameSite=Strict`;
+        // No need to set cookies manually, the server should have set the session
         router.push("/learner-home");
       } else {
         const errorData = await response.json();

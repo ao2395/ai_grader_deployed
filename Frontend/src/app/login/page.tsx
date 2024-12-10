@@ -28,10 +28,8 @@ export default function LoginPage() {
       );
 
       if (response.ok) {
-        const data = await response.json();
-        // Set the authToken as an HTTP-only cookie
-        document.cookie = `authToken=${data.token}; path=/; secure; HttpOnly; SameSite=Strict`;
-        router.push("/router-push");
+        // No need to set cookies manually, the server will set the session cookie
+        router.push("/learner-home");
       } else {
         const errorData = await response.json();
         setError(errorData.message || "Login failed");
