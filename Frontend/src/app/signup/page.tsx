@@ -4,6 +4,7 @@ import { useState, Suspense } from "react";
 import { useRouter } from "next/navigation";
 import { FcGoogle } from "react-icons/fc";
 import useGoogleOAuth from "./SignupClient";
+import Cookies from "js-cookie";
 
 export default function SignupPage() {
   const [name, setName] = useState("");
@@ -38,8 +39,10 @@ export default function SignupPage() {
       const data = await response.json();
 
       if (response.ok) {
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("userId", data.user.id);
+        // Set the token in cookies with a 7-day expiration
+        Cookies.set("token", data.token, { expires: 7, secure: true, sameSite: "strict" });
+        Cookies.set("userId", data.user.id, { expires: 7, secure: true, sameSite: "strict" });
+
         router.push("/learner-home");
       } else {
         setError(data.message || "Signup failed");
