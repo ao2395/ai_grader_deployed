@@ -16,7 +16,9 @@ const useGoogleOAuth = () => {
 
   const handleGoogleLogin = async () => {
     try {
-      const response = await fetch("/api/auth/google");
+      const response = await fetch(
+        "https://backend-839795182838.us-central1.run.app//api/v1/auth/google"
+      );
       const data = await response.json();
       // Set a secure, HTTP-only cookie instead of using localStorage
       document.cookie = `authToken=${data.token}; path=/; secure; HttpOnly; SameSite=Strict`;

@@ -10,7 +10,7 @@ export function middleware(request: NextRequest) {
   // Get the token from the cookies
   const token = request.cookies.get("authToken")?.value;
 
-  // If the path is not public and there's no token, redirect to login
+  // If the path is not public and there's no token, redirect to signup
   if (!isPublicPath && !token) {
     return NextResponse.redirect(new URL("/signup", request.url));
   }
