@@ -7,20 +7,13 @@ import { Button } from "@/components/ui/button";
 export default function LearnerHeader() {
   const router = useRouter();
 
-  const handleLogout = async () => {
-    try {
-      const response = await fetch("backend-839795182838.us-central1.run.app/api/v1/auth/logout", {
-        method: "POST",
-        credentials: "include",
-      });
-      if (response.ok) {
-        router.push("/");
-      } else {
-        console.error("Logout failed");
-      }
-    } catch (error) {
-      console.error("Logout error:", error);
-    }
+  const handleLogout = () => {
+    // Remove all user-related information from localStorage
+    localStorage.removeItem("token");
+    localStorage.removeItem("userId");
+    localStorage.removeItem("currentQuestionIndex");
+    // Redirect to the home page
+    router.push("/");
   };
 
   return (

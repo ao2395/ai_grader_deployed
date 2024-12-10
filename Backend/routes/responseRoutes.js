@@ -1,14 +1,15 @@
 const express = require("express");
 const responseController = require("../controllers/responseController");
+const authMiddleware = require("../middleware/auth");
 const responseRouter = express.Router();
 
-responseRouter.get("/", responseController.getAllResponses);
+responseRouter.get("/", authMiddleware, responseController.getAllResponses);
 
-responseRouter.post("/", responseController.createResponse);
+responseRouter.post("/", authMiddleware, responseController.createResponse);
 
 responseRouter.patch("/modifyResponse/:response_id", responseController.updateResponse);
 
-responseRouter.get("/:response_id", responseController.getOneResponse);
+responseRouter.get("/:response_id", authMiddleware, responseController.getOneResponse);
 
 responseRouter.delete("/:response_id", responseController.deleteResponse);
 

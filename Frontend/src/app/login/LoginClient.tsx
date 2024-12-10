@@ -6,10 +6,10 @@ const useGoogleOAuth = () => {
   const searchParams = new URLSearchParams(window.location.search);
 
   useEffect(() => {
-    // Check if we have a userId from Google OAuth callback
-    const userId = searchParams.get("userId");
-    if (userId) {
-      // No need to set cookies manually, the server should have set the session
+    // Check if we have a token from Google OAuth callback
+    const token = searchParams.get("token");
+    if (token) {
+      localStorage.setItem("token", token);
       router.push("/learner-home");
     }
   }, [router, searchParams]);

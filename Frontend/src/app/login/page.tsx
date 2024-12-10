@@ -3,12 +3,14 @@
 import { useState, Suspense } from "react";
 import { useRouter } from "next/navigation";
 import { FcGoogle } from "react-icons/fc";
+import useGoogleOAuth from "./LoginClient";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const router = useRouter();
+  const { handleGoogleLogin } = useGoogleOAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -19,7 +21,6 @@ export default function LoginPage() {
         "https://backend-839795182838.us-central1.run.app/api/v1/auth/login",
         {
           method: "POST",
-          credentials: "include",
           headers: {
             "Content-Type": "application/json",
           },
@@ -27,25 +28,18 @@ export default function LoginPage() {
         }
       );
 
+      const data = await response.json();
+
       if (response.ok) {
-        // No need to set cookies manually, the server will set the session cookie
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("userId", data.user.id);
         router.push("/learner-home");
       } else {
-        const errorData = await response.json();
-        setError(errorData.message || "Login failed");
+        setError(data.message || "Login failed");
       }
     } catch (error) {
       console.error("Login error:", error);
       setError("An error occurred during login");
-    }
-  };
-
-  const handleGoogleLogin = () => {
-    try {
-      window.location.href = "https://backend-839795182838.us-central1.run.app/api/v1/auth/google";
-    } catch (error) {
-      console.error("Error initiating Google login:", error);
-      setError("An error occurred while initiating Google login");
     }
   };
 

@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState, useCallback } from "react";
 import dynamic from "next/dynamic";
 import { Button } from "@/components/ui/button";
 import p5Types from "p5";
+import { authenticatedFetch } from "@/app/utils/api";
 
 const Sketch = dynamic(() => import("react-p5").then((mod) => mod.default), {
   ssr: false,
@@ -194,15 +195,13 @@ export default function Canvas() {
 
       const formData = new FormData();
       const timestamp = Date.now();
-      //formData.append('file', audioBlob, '8888recorded_audio.mp3');
       formData.append("file", audioBlob, `${timestamp}_nopw___tryryryrecorded_audio.wav`);
 
       try {
-        const response = await fetch(
+        const response = await authenticatedFetch(
           "https://backend-839795182838.us-central1.run.app/api/v1/upload/audio",
           {
             method: "POST",
-            credentials: "include",
             body: formData,
           }
         );
@@ -246,11 +245,10 @@ export default function Canvas() {
       formData.append("file", canvasBlob, "c333anvasImage.png");
 
       try {
-        const response = await fetch(
+        const response = await authenticatedFetch(
           "https://backend-839795182838.us-central1.run.app/api/v1/upload/image",
           {
             method: "POST",
-            credentials: "include",
             body: formData,
           }
         );

@@ -10,6 +10,7 @@ import Footer from "@/components/Footer";
 import SubmitButton from "@/components/ui/submit-button";
 import QuestionNavigation from "@/components/QuestionNavigation";
 import LearnerHeader from "@/components/LearnerHeader";
+import { authenticatedFetch } from "@/app/utils/api";
 
 interface QuestionData {
   _id: string;
@@ -38,11 +39,8 @@ export default function PracticePage() {
     const loadQuestions = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch(
-          "https://backend-839795182838.us-central1.run.app/api/v1/questions",
-          {
-            credentials: "include",
-          }
+        const response = await authenticatedFetch(
+          "https://backend-839795182838.us-central1.run.app/api/v1/questions"
         );
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -77,11 +75,10 @@ export default function PracticePage() {
           formData.append("file", blob, `${questions[currentQuestionIndex]._id}.png`);
 
           try {
-            const response = await fetch(
+            const response = await authenticatedFetch(
               "https://backend-839795182838.us-central1.run.app/api/v1/upload/image",
               {
                 method: "POST",
-                credentials: "include",
                 body: formData,
               }
             );

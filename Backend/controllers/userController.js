@@ -1,6 +1,9 @@
 const User = require("../models/userModel");
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+
+const JWT_SECRET = process.env.JWT_SECRET;
 
 const registerUser = async (req, res) => {
   try {
@@ -25,6 +28,20 @@ const registerUser = async (req, res) => {
     // Save user to database
     try {
       await user.save();
+      const payload = {
+        user: {
+          id: user.id,
+        },
+      };
+
+      jwt.sign(payload, JWT_SECRET, { expiresIn: "1d" }, (err, token) => {
+        if (err) throw err;
+        res.status(201).json({
+          message: "User registered successfully",
+          token,
+          user: { id: user.id, name: user.name, email: user.email },
+        });
+      });
       console.log("User saved successfully:", user);
     } catch (saveError) {
       console.error("Error saving user:", saveError);
@@ -32,28 +49,13 @@ const registerUser = async (req, res) => {
         .status(500)
         .json({ message: "Error saving user to database", error: saveError.message });
     }
-
-    // Log the user in
-    req.login(user, (loginError) => {
-      if (loginError) {
-        console.error("Error logging in after registration:", loginError);
-        return res
-          .status(500)
-          .json({ message: "Error logging in after registration", error: loginError.message });
-      }
-      req.session.userId = user.id;
-      res.status(201).json({
-        message: "User registered successfully",
-        user: { id: user.id, name: user.name, email: user.email },
-      });
-    });
   } catch (error) {
     console.error("Registration error:", error);
     res.status(500).json({ message: "Failed to register user", error: error.message });
   }
 };
 
-const loginUser = async (req, res, next) => {
+const loginUser = async (req, res) => {
   const { email, password } = req.body;
 
   try {
@@ -71,19 +73,19 @@ const loginUser = async (req, res, next) => {
       return res.status(400).json({ message: "Invalid email or password" });
     }
 
-    // If credentials are correct, log the user in
-    req.login(user, (err) => {
-      if (err) {
-        return next(err);
-      }
-      req.session.save((err) => {
-        if (err) {
-          return next(err);
-        }
-        return res.json({
-          message: "Logged in successfully",
-          user: { id: user.id, name: user.name, email: user.email },
-        });
+    // If credentials are correct, create and send a token
+    const payload = {
+      user: {
+        id: user.id,
+      },
+    };
+
+    jwt.sign(payload, JWT_SECRET, { expiresIn: "1d" }, (err, token) => {
+      if (err) throw err;
+      res.json({
+        message: "Logged in successfully",
+        token,
+        user: { id: user.id, name: user.name, email: user.email },
       });
     });
   } catch (error) {
@@ -91,21 +93,21 @@ const loginUser = async (req, res, next) => {
   }
 };
 
-// logoout user
-const logoutUser = async (req, res) => {
-  req.logout((err) => {
-    if (err) {
-      return res.status(500).json({ message: "Error logging out" });
-    }
-    req.session.destroy((err) => {
-      if (err) {
-        return res.status(500).json({ message: "Error destroying session" });
-      }
-      res.clearCookie("connect.sid");
-      return res.status(200).json({ message: "Logout successful" });
-    });
-  });
-};
+// // logoout user
+// const logoutUser = async (req, res) => {
+//   req.logout((err) => {
+//     if (err) {
+//       return res.status(500).json({ message: "Error logging out" });
+//     }
+//     req.session.destroy((err) => {
+//       if (err) {
+//         return res.status(500).json({ message: "Error destroying session" });
+//       }
+//       res.clearCookie("connect.sid");
+//       return res.status(200).json({ message: "Logout successful" });
+//     });
+//   });
+// };
 
 // get all users
 const getAllUsers = async (req, res) => {

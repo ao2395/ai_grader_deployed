@@ -8,6 +8,7 @@ import FeedbackPageSubheader from "@/components/FeedbackPageSubheader";
 import FeedbackContent from "@/components/FeedbackContent";
 import Footer from "@/components/Footer";
 import LearnerHeader from "@/components/LearnerHeader";
+import { authenticatedFetch } from "@/app/utils/api";
 
 interface QuestionData {
   _id: string;
@@ -46,11 +47,10 @@ export default function FeedbackPage() {
 
   const saveResponse = async (feedbackData: FeedbackData, questionId: string, userId: string) => {
     try {
-      const response = await fetch(
+      const response = await authenticatedFetch(
         "https://backend-839795182838.us-central1.run.app/api/v1/responses",
         {
           method: "POST",
-          credentials: "include",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             user_id: userId,
@@ -89,11 +89,8 @@ export default function FeedbackPage() {
         }
         setUserId(storedUserId);
 
-        const questionResponse = await fetch(
-          "http://https://backend-839795182838.us-central1.run.app/api/v1/questions",
-          {
-            credentials: "include",
-          }
+        const questionResponse = await authenticatedFetch(
+          "https://backend-839795182838.us-central1.run.app/api/v1/questions"
         );
         if (!questionResponse.ok) throw new Error(`HTTP error! status: ${questionResponse.status}`);
         const questionData = await questionResponse.json();
@@ -107,11 +104,10 @@ export default function FeedbackPage() {
         if (isMounted && currentQuestion) {
           setQuestionData(currentQuestion);
 
-          const feedbackResponse = await fetch(
-            `http://https://backend-839795182838.us-central1.run.app/api/v1/submit`,
+          const feedbackResponse = await authenticatedFetch(
+            `https://backend-839795182838.us-central1.run.app/api/v1/submit`,
             {
               method: "POST",
-              credentials: "include",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
                 questionId: currentQuestion._id,

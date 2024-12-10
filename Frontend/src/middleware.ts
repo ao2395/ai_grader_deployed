@@ -7,16 +7,16 @@ export function middleware(request: NextRequest) {
   // Define which paths are considered public (don't require authentication)
   const isPublicPath = path === "/login" || path === "/signup" || path === "/";
 
-  // Check for session cookie
-  const sessionId = request.cookies.get("connect.sid")?.value;
+  // Check for JWT token in cookies
+  const token = request.cookies.get("token")?.value;
 
-  // If the path is not public and there's no token, redirect to signup
-  if (!isPublicPath && !sessionId) {
-    return NextResponse.redirect(new URL("/signup", request.url));
+  // If the path is not public and there's no token, redirect to login
+  if (!isPublicPath && !token) {
+    return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  // If the user is logged in and tries to access login or signup, redirect to learner-home
-  if (isPublicPath && sessionId) {
+  // If the user has a token and tries to access login or signup, redirect to learner-home
+  if (isPublicPath && token) {
     return NextResponse.redirect(new URL("/learner-home", request.url));
   }
 

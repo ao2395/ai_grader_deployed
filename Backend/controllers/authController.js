@@ -1,7 +1,8 @@
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
-const LocalStrategy = require("passport-local").Strategy;
-const bcrypt = require("bcryptjs");
 const User = require("../models/userModel");
+const jwt = require("jsonwebtoken");
+
+const JWT_SECRET = process.env.JWT_SECRET;
 
 module.exports = function (passport) {
   passport.use(
@@ -24,42 +25,39 @@ module.exports = function (passport) {
             await user.save();
           }
 
-          return cb(null, user);
+          const payload = {
+            user: {
+              id: user.id,
+            },
+          };
+
+          jwt.sign(payload, JWT_SECRET, { expiresIn: "1d" }, (err, token) => {
+            if (err) return cb(err);
+            return cb(null, { user, token });
+          });
         } catch (err) {
           return cb(err);
         }
       }
     )
   );
-
-  passport.use(
-    new LocalStrategy({ usernameField: "email" }, async (email, password, done) => {
-      try {
-        const user = await User.findOne({ email });
-        if (!user) {
-          return done(null, false, { message: "Incorrect email." });
-        }
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) {
-          return done(null, false, { message: "Incorrect password." });
-        }
-        return done(null, user);
-      } catch (err) {
-        return done(err);
-      }
-    })
-  );
-
-  passport.serializeUser((user, done) => {
-    done(null, user.id);
-  });
-
-  passport.deserializeUser(async (id, done) => {
-    try {
-      const user = await User.findById(id);
-      done(null, user);
-    } catch (err) {
-      done(err);
-    }
-  });
 };
+
+// Middleware to verify JWT token
+const authenticateJWT = (req, res, next) => {
+  const token = req.header("x-auth-token");
+
+  if (!token) {
+    return res.status(401).json({ message: "No token, authorization denied" });
+  }
+
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    req.user = decoded.user;
+    next();
+  } catch (err) {
+    res.status(401).json({ message: "Token is not valid" });
+  }
+};
+
+module.exports.authenticateJWT = authenticateJWT;
