@@ -1,4 +1,4 @@
-import { useRouter } from "next/navigation";
+import { useRouter } from "next/router";
 import { useEffect } from "react";
 
 const useGoogleOAuth = () => {
@@ -9,14 +9,15 @@ const useGoogleOAuth = () => {
     // Check if we have a token from Google OAuth callback
     const token = searchParams.get("token");
     if (token) {
-      localStorage.setItem("token", token);
-      router.push("/learner-home");
+      document.cookie = `authToken=${token}; path=/; secure; HttpOnly; SameSite=Strict`;
+      router.push("/practice");
     }
   }, [router, searchParams]);
 
   const handleGoogleLogin = async () => {
     try {
-      window.location.href = "https://backend-839795182838.us-central1.run.app/api/v1/auth/google";
+      window.location.href =
+        "https://backend-839795182838.us-central1.run.app/api/v1/auth/google?redirect_url=https://frontend-839795182838.us-central1.run.app/auth/callback";
     } catch (error) {
       console.error("Error during Google login:", error);
     }
