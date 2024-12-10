@@ -20,7 +20,7 @@ interface QuestionData {
 
 function LatexQuestion({ question }: { question: string }) {
   return (
-    <div className="text-lg mb-4 overflow-x-auto p-4">
+    <div className='text-lg mb-4 overflow-x-auto p-4'>
       <MathJax>{`$$${question}$$`}</MathJax>
     </div>
   );
@@ -39,7 +39,10 @@ export default function PracticePage() {
       try {
         setIsLoading(true);
         const response = await fetch(
-          "https://backend-839795182838.us-central1.run.app/api/v1/questions"
+          "https://backend-839795182838.us-central1.run.app/api/v1/questions",
+          {
+            credentials: "include",
+          }
         );
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -78,6 +81,7 @@ export default function PracticePage() {
               "https://backend-839795182838.us-central1.run.app/api/v1/upload/image",
               {
                 method: "POST",
+                credentials: "include",
                 body: formData,
               }
             );
@@ -120,23 +124,25 @@ export default function PracticePage() {
   };
 
   if (isLoading) {
-    return <div className="min-h-screen flex items-center justify-center">Loading questions...</div>;
+    return (
+      <div className='min-h-screen flex items-center justify-center'>Loading questions...</div>
+    );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-red-500">{error}</div>
+      <div className='min-h-screen flex items-center justify-center text-red-500'>{error}</div>
     );
   }
 
   return (
     <MathJaxContext>
-      <div className="min-h-screen bg-gray-100 flex flex-col">
+      <div className='min-h-screen bg-gray-100 flex flex-col'>
         <LearnerHeader />
-        <div className="flex-grow p-8">
-          <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
+        <div className='flex-grow p-8'>
+          <div className='max-w-4xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden'>
             <PracticePageSubheader />
-            <div className="p-6">
+            <div className='p-6'>
               <ModeToggle mode={mode} setMode={setMode} />
               {questions.length > 0 && (
                 <LatexQuestion

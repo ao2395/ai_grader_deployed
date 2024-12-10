@@ -7,15 +7,20 @@ import { Button } from "@/components/ui/button";
 export default function LearnerHeader() {
   const router = useRouter();
 
-  const handleLogout = () => {
-    // Clear the auth token cookie
-    document.cookie = "authToken=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
-
-    // Clear any data from localStorage
-    localStorage.clear();
-
-    // Redirect to the home page
-    router.push("/");
+  const handleLogout = async () => {
+    try {
+      const response = await fetch("backend-839795182838.us-central1.run.app/api/v1/auth/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+      if (response.ok) {
+        router.push("/");
+      } else {
+        console.error("Logout failed");
+      }
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
   };
 
   return (

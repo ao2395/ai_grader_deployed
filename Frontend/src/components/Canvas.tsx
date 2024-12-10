@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import React, { useEffect, useRef, useState, useCallback } from 'react';
-import dynamic from 'next/dynamic';
+import React, { useEffect, useRef, useState, useCallback } from "react";
+import dynamic from "next/dynamic";
 import { Button } from "@/components/ui/button";
-import p5Types from 'p5';
+import p5Types from "p5";
 
-const Sketch = dynamic(() => import('react-p5').then((mod) => mod.default), {
+const Sketch = dynamic(() => import("react-p5").then((mod) => mod.default), {
   ssr: false,
 });
 
@@ -20,28 +20,31 @@ export default function Canvas() {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
 
-  const preventScroll = useCallback((e: TouchEvent) => {
-    if (isDrawing) {
-      e.preventDefault();
-    }
-  }, [isDrawing]);
+  const preventScroll = useCallback(
+    (e: TouchEvent) => {
+      if (isDrawing) {
+        e.preventDefault();
+      }
+    },
+    [isDrawing]
+  );
 
   useEffect(() => {
     const container = containerRef.current;
     if (container) {
-      container.style.touchAction = 'none';
+      container.style.touchAction = "none";
     }
 
-    document.body.addEventListener('touchmove', preventScroll, { passive: false });
+    document.body.addEventListener("touchmove", preventScroll, { passive: false });
 
     return () => {
-      document.body.removeEventListener('touchmove', preventScroll);
+      document.body.removeEventListener("touchmove", preventScroll);
     };
   }, [preventScroll]);
 
   useEffect(() => {
     if (!isRecording && mediaRecorderRef.current) {
-      mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop());
+      mediaRecorderRef.current.stream.getTracks().forEach((track) => track.stop());
     }
   }, [isRecording]);
 
@@ -63,14 +66,14 @@ export default function Canvas() {
   const draw = (p5: p5Types) => {
     if (isDrawing) {
       const halfWidth = p5.width / 2;
-      const adjustedMouseX = p5.mouseX - (currentSection * halfWidth);
-      const adjustedPMouseX = p5.pmouseX - (currentSection * halfWidth);
-      
+      const adjustedMouseX = p5.mouseX - currentSection * halfWidth;
+      const adjustedPMouseX = p5.pmouseX - currentSection * halfWidth;
+
       if (adjustedMouseX >= 0 && adjustedMouseX < halfWidth) {
         p5.line(
-          adjustedPMouseX + (currentSection * halfWidth), 
-          p5.pmouseY, 
-          adjustedMouseX + (currentSection * halfWidth), 
+          adjustedPMouseX + currentSection * halfWidth,
+          p5.pmouseY,
+          adjustedMouseX + currentSection * halfWidth,
           p5.mouseY
         );
       }
@@ -79,8 +82,8 @@ export default function Canvas() {
 
   const mousePressed = (p5: p5Types) => {
     const halfWidth = p5.width / 2;
-    const adjustedMouseX = p5.mouseX - (currentSection * halfWidth);
-    
+    const adjustedMouseX = p5.mouseX - currentSection * halfWidth;
+
     if (adjustedMouseX >= 0 && adjustedMouseX < halfWidth) {
       setIsDrawing(true);
     }
@@ -94,8 +97,8 @@ export default function Canvas() {
     const halfWidth = p5.width / 2;
     if (p5.touches && p5.touches.length > 0) {
       const touch = p5.touches[0] as p5Types.Vector;
-      const adjustedTouchX = touch.x - (currentSection * halfWidth);
-      
+      const adjustedTouchX = touch.x - currentSection * halfWidth;
+
       if (adjustedTouchX >= 0 && adjustedTouchX < halfWidth) {
         setIsDrawing(true);
       }
@@ -111,10 +114,10 @@ export default function Canvas() {
   const switchSection = () => {
     const newSection = (currentSection + 1) % 2;
     setCurrentSection(newSection);
-    setButtonText((prev) => prev === "Next Section" ? "Prev Section" : "Next Section");
+    setButtonText((prev) => (prev === "Next Section" ? "Prev Section" : "Next Section"));
 
     if (containerRef.current) {
-      containerRef.current.scrollLeft = newSection * (containerRef.current.clientWidth);
+      containerRef.current.scrollLeft = newSection * containerRef.current.clientWidth;
     }
   };
 
@@ -145,21 +148,21 @@ export default function Canvas() {
       mediaRecorderRef.current.start();
       setIsRecording(true);
     } catch (error) {
-      console.error('Error starting recording:', error);
+      console.error("Error starting recording:", error);
     }
   };
 
   const stopRecording = useCallback(() => {
-    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
       mediaRecorderRef.current.stop();
-      mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop());
+      mediaRecorderRef.current.stream.getTracks().forEach((track) => track.stop());
       setIsRecording(false);
     }
   }, []);
 
   const downloadFile = (blob: Blob, filename: string) => {
     const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
+    const link = document.createElement("a");
     link.href = url;
     link.download = filename;
     link.click();
@@ -187,35 +190,37 @@ export default function Canvas() {
 
   const saveAudio = async () => {
     if (audioChunksRef.current.length > 0) {
-      const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
-  
+      const audioBlob = new Blob(audioChunksRef.current, { type: "audio/wav" });
+
       const formData = new FormData();
       const timestamp = Date.now();
       //formData.append('file', audioBlob, '8888recorded_audio.mp3');
-      formData.append('file', audioBlob, `${timestamp}_nopw___tryryryrecorded_audio.wav`);
-  
+      formData.append("file", audioBlob, `${timestamp}_nopw___tryryryrecorded_audio.wav`);
+
       try {
-        const response = await fetch('https://backend-839795182838.us-central1.run.app/api/v1/upload/audio', {
-          method: 'POST',
-          body: formData,
-        });
-        downloadFile(audioBlob, 'recorded_audio.wav');
-  
+        const response = await fetch(
+          "https://backend-839795182838.us-central1.run.app/api/v1/upload/audio",
+          {
+            method: "POST",
+            credentials: "include",
+            body: formData,
+          }
+        );
+        downloadFile(audioBlob, "recorded_audio.wav");
+
         const data = await response.json();
         if (response.ok) {
-          console.log('Audio uploaded successfully:', data.publicUrl);
+          console.log("Audio uploaded successfully:", data.publicUrl);
         } else {
-          console.error('Failed to upload audio:', data.message || 'Unknown error');
+          console.error("Failed to upload audio:", data.message || "Unknown error");
         }
       } catch (error) {
-        console.error('Error uploading audio:', error);
+        console.error("Error uploading audio:", error);
       }
     } else {
-      console.log('No audio recorded yet');
+      console.log("No audio recorded yet");
     }
-
   };
-  
 
   // const saveImage = () => {
   //   downloadImage();
@@ -233,34 +238,36 @@ export default function Canvas() {
   //     console.error('Failed to retrieve canvas content.');
   //   }
   // };
-  
+
   const saveImage = async () => {
     const canvasBlob = await getCanvasBlob();
     if (canvasBlob) {
       const formData = new FormData();
-      formData.append('file', canvasBlob, 'c333anvasImage.png');
-  
+      formData.append("file", canvasBlob, "c333anvasImage.png");
+
       try {
-        const response = await fetch('https://backend-839795182838.us-central1.run.app/api/v1/upload/image', {
-          method: 'POST',
-          body: formData,
-        });
-  
+        const response = await fetch(
+          "https://backend-839795182838.us-central1.run.app/api/v1/upload/image",
+          {
+            method: "POST",
+            credentials: "include",
+            body: formData,
+          }
+        );
+
         const data = await response.json();
         if (response.ok) {
-          console.log('Image uploaded successfully:', data.publicUrl);
+          console.log("Image uploaded successfully:", data.publicUrl);
         } else {
-          console.error('Failed to upload image:', data.message || 'Unknown error');
+          console.error("Failed to upload image:", data.message || "Unknown error");
         }
       } catch (error) {
-        console.error('Error uploading image:', error);
+        console.error("Error uploading image:", error);
       }
     } else {
-      console.error('Failed to retrieve canvas content.');
+      console.error("Failed to retrieve canvas content.");
     }
   };
-  
-  
 
   const handleRecordingToggle = () => {
     if (isRecording) {
@@ -275,23 +282,22 @@ export default function Canvas() {
       if (canvasRef.current) {
         canvasRef.current.toBlob((blob) => {
           resolve(blob);
-        }, 'image/png');
+        }, "image/png");
       } else {
         resolve(null);
       }
     });
   };
-  
 
   return (
-    <div className="flex flex-col items-center w-full max-w-4xl mx-auto p-4">
+    <div className='flex flex-col items-center w-full max-w-4xl mx-auto p-4'>
       <div
         ref={containerRef}
-        className="w-full border border-gray-300 rounded-lg overflow-hidden"
-        style={{ height: '500px' }}
+        className='w-full border border-gray-300 rounded-lg overflow-hidden'
+        style={{ height: "500px" }}
       >
-        <Sketch 
-          setup={setup} 
+        <Sketch
+          setup={setup}
           draw={draw}
           mousePressed={mousePressed}
           mouseReleased={mouseReleased}
@@ -299,28 +305,23 @@ export default function Canvas() {
           touchEnded={touchEnded}
         />
       </div>
-      <div className="flex flex-wrap justify-center gap-2 mt-4">
-        <Button onClick={switchSection} variant="secondary">
+      <div className='flex flex-wrap justify-center gap-2 mt-4'>
+        <Button onClick={switchSection} variant='secondary'>
           {buttonText}
         </Button>
-        <Button onClick={clearCanvas} variant="destructive">
+        <Button onClick={clearCanvas} variant='destructive'>
           Clear Canvas
         </Button>
-        <Button
-          onClick={handleRecordingToggle}
-          variant={isRecording ? "outline" : "default"}
-        >
-          {isRecording ? 'Stop Recording' : 'Start Recording'}
+        <Button onClick={handleRecordingToggle} variant={isRecording ? "outline" : "default"}>
+          {isRecording ? "Stop Recording" : "Start Recording"}
         </Button>
-        <Button onClick={saveImage} variant="default">
+        <Button onClick={saveImage} variant='default'>
           Save Image
         </Button>
-        <Button onClick={saveAudio} variant="default">
+        <Button onClick={saveAudio} variant='default'>
           Save Audio
         </Button>
       </div>
     </div>
   );
 }
-
-

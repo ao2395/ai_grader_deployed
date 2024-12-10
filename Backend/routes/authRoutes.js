@@ -17,13 +17,6 @@ authRouter.post("/register", userController.registerUser);
 
 authRouter.post("/login", userController.loginUser);
 
-authRouter.get("/logout", (req, res) => {
-  req.logout((err) => {
-    if (err) {
-      return next(err);
-    }
-    res.redirect("https://frontend-839795182838.us-central1.run.app/");
-  });
-});
+authRouter.post("/logout", userController.logoutUser);
 
 module.exports = authRouter;

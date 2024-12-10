@@ -85,6 +85,22 @@ const loginUser = async (req, res, next) => {
   }
 };
 
+// logoout user
+const logoutUser = async (req, res) => {
+  req.logout((err) => {
+    if (err) {
+      return res.status(500).json({ message: "Error logging out" });
+    }
+    req.session.destroy((err) => {
+      if (err) {
+        return res.status(500).json({ message: "Error destroying session" });
+      }
+      res.clearCookie("connect.sid");
+      return res.status(200).json({ message: "Logout successful" });
+    });
+  });
+};
+
 // get all users
 const getAllUsers = async (req, res) => {
   try {
@@ -169,6 +185,7 @@ const deleteUser = async (req, res) => {
 module.exports = {
   registerUser,
   loginUser,
+  logoutUser,
   getAllUsers,
   getOneUser,
   createUser,

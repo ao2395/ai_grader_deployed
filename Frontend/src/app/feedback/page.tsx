@@ -9,7 +9,6 @@ import FeedbackContent from "@/components/FeedbackContent";
 import Footer from "@/components/Footer";
 import LearnerHeader from "@/components/LearnerHeader";
 
-
 interface QuestionData {
   _id: string;
   index: number;
@@ -47,17 +46,21 @@ export default function FeedbackPage() {
 
   const saveResponse = async (feedbackData: FeedbackData, questionId: string, userId: string) => {
     try {
-      const response = await fetch("https://backend-839795182838.us-central1.run.app/api/v1/responses", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          user_id: userId,
-          question_id: questionId,
-          gpt_written_feedback: feedbackData.writtenFeedback,
-          gpt_spoken_feedback: feedbackData.spokenFeedback,
-          grade: feedbackData.grade,
-        }),
-      });
+      const response = await fetch(
+        "https://backend-839795182838.us-central1.run.app/api/v1/responses",
+        {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            user_id: userId,
+            question_id: questionId,
+            gpt_written_feedback: feedbackData.writtenFeedback,
+            gpt_spoken_feedback: feedbackData.spokenFeedback,
+            grade: feedbackData.grade,
+          }),
+        }
+      );
 
       if (!response.ok) {
         const errorText = await response.text();
@@ -86,7 +89,12 @@ export default function FeedbackPage() {
         }
         setUserId(storedUserId);
 
-        const questionResponse = await fetch("http://localhost:3000/api/v1/questions");
+        const questionResponse = await fetch(
+          "http://https://backend-839795182838.us-central1.run.app/api/v1/questions",
+          {
+            credentials: "include",
+          }
+        );
         if (!questionResponse.ok) throw new Error(`HTTP error! status: ${questionResponse.status}`);
         const questionData = await questionResponse.json();
         setTotalQuestions(questionData.length);
@@ -99,14 +107,18 @@ export default function FeedbackPage() {
         if (isMounted && currentQuestion) {
           setQuestionData(currentQuestion);
 
-          const feedbackResponse = await fetch(`http://localhost:3000/api/v1/submit`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              questionId: currentQuestion._id,
-              userId: storedUserId,
-            }),
-          });
+          const feedbackResponse = await fetch(
+            `http://https://backend-839795182838.us-central1.run.app/api/v1/submit`,
+            {
+              method: "POST",
+              credentials: "include",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                questionId: currentQuestion._id,
+                userId: storedUserId,
+              }),
+            }
+          );
 
           if (feedbackResponse.ok) {
             const feedbackData = await feedbackResponse.json();
@@ -120,7 +132,9 @@ export default function FeedbackPage() {
         }
       } catch (err) {
         console.error("Failed to save response:", err);
-        setError(`Failed to save response. ${err instanceof Error ? err.message : "Please try again."}`);
+        setError(
+          `Failed to save response. ${err instanceof Error ? err.message : "Please try again."}`
+        );
       } finally {
         if (isMounted) setIsLoading(false);
       }
@@ -171,7 +185,7 @@ export default function FeedbackPage() {
   return (
     <MathJaxContext config={config}>
       <div className='min-h-screen bg-gray-100 flex flex-col'>
-      <LearnerHeader />
+        <LearnerHeader />
         <div className='flex-grow p-8'>
           <div className='max-w-4xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden'>
             <FeedbackPageSubheader />

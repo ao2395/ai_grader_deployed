@@ -19,6 +19,7 @@ export default function LoginPage() {
         "https://backend-839795182838.us-central1.run.app/api/v1/auth/login",
         {
           method: "POST",
+          credentials: "include",
           headers: {
             "Content-Type": "application/json",
           },

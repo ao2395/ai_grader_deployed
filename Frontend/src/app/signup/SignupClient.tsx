@@ -35,6 +35,7 @@ export default function SignupClient() {
         "https://backend-839795182838.us-central1.run.app/api/v1/auth/register",
         {
           method: "POST",
+          credentials: "include",
           headers: {
             "Content-Type": "application/json",
           },
