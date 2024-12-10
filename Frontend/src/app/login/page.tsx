@@ -30,7 +30,7 @@ export default function LoginPage() {
         const data = await response.json();
         // Set the authToken as an HTTP-only cookie
         document.cookie = `authToken=${data.token}; path=/; secure; HttpOnly; SameSite=Strict`;
-        router.push("/practice");
+        router.push("/router-push");
       } else {
         const errorData = await response.json();
         setError(errorData.message || "Login failed");
