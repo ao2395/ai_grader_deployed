@@ -44,6 +44,12 @@ app.use(
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
+    cookie: {
+      secure: process.env.NODE_ENV === "deployment", // Use secure cookies in production
+      // httpOnly: true,
+      sameSite: "none", // Required for cross-domain cookies
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    },
   })
 );
 
