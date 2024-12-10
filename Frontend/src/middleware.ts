@@ -16,7 +16,7 @@ export function middleware(request: NextRequest) {
   }
 
   // If the user is logged in and tries to access login or signup, redirect to learner-home
-  if (isPublicPath && token) {
+  if (isPublicPath && sessionId) {
     return NextResponse.redirect(new URL("/learner-home", request.url));
   }
 
