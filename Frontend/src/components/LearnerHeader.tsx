@@ -12,7 +12,6 @@ export default function LearnerHeader() {
     // Remove all user-related cookies
     Cookies.remove("token");
     Cookies.remove("userId");
-    Cookies.remove("currentQuestionIndex"); // If this is stored in cookies as well
   
     // Redirect to the home page
     router.push("/");
