@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Cookies from "js-cookie"; // Import js-cookie for cookie management
 import { MathJaxContext, MathJax } from "better-react-mathjax";
 import { Button } from "@/components/ui/button";
 import FeedbackPageSubheader from "@/components/FeedbackPageSubheader";
@@ -67,8 +68,6 @@ export default function FeedbackPage() {
         console.error("Response not OK:", response.status, errorText);
         throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
       }
-
-      //const result = await response.json();
     } catch (error) {
       console.error("Failed to save response:", error);
       setError(
@@ -83,20 +82,26 @@ export default function FeedbackPage() {
     const loadData = async () => {
       try {
         setIsLoading(true);
-        const storedUserId = localStorage.getItem("userId");
+
+        // Get userId from cookies
+        const storedUserId = Cookies.get("userId");
         if (!storedUserId) {
-          throw new Error("No user ID found");
+          throw new Error("No user ID found in cookies");
         }
         setUserId(storedUserId);
 
+        // Fetch questions data
         const questionResponse = await authenticatedFetch(
           "https://backend-839795182838.us-central1.run.app/api/v1/questions"
         );
         if (!questionResponse.ok) throw new Error(`HTTP error! status: ${questionResponse.status}`);
+
         const questionData = await questionResponse.json();
         setTotalQuestions(questionData.length);
+
+        // Get current question index from localStorage
         const storedIndex = localStorage.getItem("currentQuestionIndex");
-        if (storedIndex === null) throw new Error("No question index found");
+        if (storedIndex === null) throw new Error("No question index found in localStorage");
 
         const questionIndex = parseInt(storedIndex, 10);
         const currentQuestion = questionData[questionIndex];
@@ -119,7 +124,7 @@ export default function FeedbackPage() {
           if (feedbackResponse.ok) {
             const feedbackData = await feedbackResponse.json();
             setFeedbackData(feedbackData);
-            await saveResponse(feedbackData, currentQuestion._id, userId);
+            await saveResponse(feedbackData, currentQuestion._id, storedUserId);
           } else {
             throw new Error(`HTTP error! status: ${feedbackResponse.status}`);
           }
@@ -127,10 +132,8 @@ export default function FeedbackPage() {
           setError(`Question with index ${questionIndex} not found`);
         }
       } catch (err) {
-        console.error("Failed to save response:", err);
-        setError(
-          `Failed to save response. ${err instanceof Error ? err.message : "Please try again."}`
-        );
+        console.error("Error loading data:", err);
+        setError(`Error loading data. ${err instanceof Error ? err.message : "Please try again."}`);
       } finally {
         if (isMounted) setIsLoading(false);
       }
@@ -141,29 +144,13 @@ export default function FeedbackPage() {
     return () => {
       isMounted = false;
     };
-  }, [userId]);
+  }, []);
 
   const handleTryAnotherQuestion = () => {
     const currentIndex = parseInt(localStorage.getItem("currentQuestionIndex") || "0", 10);
-    console.log(currentIndex);
     const nextIndex = (currentIndex + 1) % totalQuestions;
-    console.log(nextIndex);
     localStorage.setItem("currentQuestionIndex", nextIndex.toString());
     router.push("/practice");
-  };
-
-  const formatSolution = (solution: string) => {
-    return solution
-      .split("\n")
-      .map((line) => {
-        line = line.trim();
-        if (line.startsWith("\\text{") || !line.includes("\\")) {
-          return line.replace("\\text{", "").replace("}", "");
-        } else {
-          return `${line}`;
-        }
-      })
-      .join("\n");
   };
 
   if (isLoading) {
@@ -194,7 +181,7 @@ export default function FeedbackPage() {
               <div className='mt-6'>
                 <h3 className='text-lg font-semibold mb-2'>AI Solution:</h3>
                 <div className='bg-gray-100 p-4 rounded-md overflow-x-auto'>
-                  <MathJax>{formatSolution(questionData.ai_solution)}</MathJax>
+                  <MathJax>{questionData.ai_solution}</MathJax>
                 </div>
               </div>
               <Button
