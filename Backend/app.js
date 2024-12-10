@@ -27,8 +27,8 @@ if (process.env.NODE_ENV !== "deployment") {
 } else {
   app.use(cors({ origin: `https://frontend-839795182838.us-central1.run.app`, credentials: true }));
   const limiter = rateLimit({
-    max: 100,
-    windowMs: 60 * 60 * 1000,
+    max: 200,
+    windowMs: 3 * 60 * 1000,
     message: "Too many requests from this IP, please try again in an hour",
   });
   app.use("/api", limiter);
