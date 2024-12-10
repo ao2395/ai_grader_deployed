@@ -49,7 +49,7 @@ const path = require("path");
 
 // const router = express.Router();
 const storage = new Storage({
-  credentials: JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON)
+  credentials: JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON),
 });
 const bucket = storage.bucket("ai-grader-storage");
 
@@ -98,7 +98,49 @@ async function uploadToGCS(file, res) {
 // });
 
 // module.exports = router;
+async function uploadToResearchStorage(file, res) {
+  try {
+    if (!file) {
+      return res.status(400).send("No file uploaded.");
+    }
+
+    // Construct the full path with the directory
+    const directoryPath = "future_research_storage/";
+    const fullPath = `${directoryPath}${file.originalname}`;
+
+    const blob = bucket.file(fullPath);
+    const blobStream = blob.createWriteStream({
+      resumable: false,
+      contentType: file.mimetype,
+    });
+
+    blobStream.on("error", (err) => {
+      console.error("Upload error:", err);
+      res.status(500).send({ message: err.message });
+    });
+
+    blobStream.on("finish", () => {
+      const publicUrl = `https://storage.googleapis.com/${bucket.name}/${fullPath}`;
+      res.status(200).send({
+        message: "Upload successful",
+        fileName: file.originalname,
+        storagePath: fullPath,
+        publicUrl,
+      });
+    });
+
+    blobStream.end(file.buffer);
+  } catch (error) {
+    console.error("Upload handler error:", error);
+    res.status(500).send({
+      message: "Failed to process upload",
+      error: error.message,
+    });
+  }
+}
+
 module.exports = {
   uploadToGCS,
   upload,
+  uploadToResearchStorage,
 };
