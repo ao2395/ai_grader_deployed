@@ -16,8 +16,8 @@ export default function SignupClient() {
     // Check if we have a userId from Google OAuth callback
     const userId = searchParams.get("userId");
     if (userId) {
-      localStorage.setItem("userId", userId);
-      router.push("/practice");
+      document.cookie = `authToken=${userId}; path=/; secure; HttpOnly; SameSite=Strict`;
+      router.push("/learner-home");
     }
   }, [router, searchParams]);
 
@@ -31,19 +31,21 @@ export default function SignupClient() {
     }
 
     try {
-      const response = await fetch("https://backend-839795182838.us-central1.run.app/api/v1/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ name, email, password }),
-      });
+      const response = await fetch(
+        "https://backend-839795182838.us-central1.run.app/api/v1/auth/register",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ name, email, password }),
+        }
+      );
 
       if (response.ok) {
         const data = await response.json();
-        console.log("Sign up successful:", data);
-        localStorage.setItem("userId", data.user.id);
-        router.push("/practice");
+        document.cookie = `authToken=${data.token}; path=/; secure; HttpOnly; SameSite=Strict`;
+        router.push("/learner-home");
       } else {
         const errorData = await response.json();
         setError(errorData.message || "Sign up failed");
@@ -56,84 +58,88 @@ export default function SignupClient() {
 
   return (
     <>
-      {error && <div className="mb-4 text-red-600 text-center">{error}</div>}
-      <form className="space-y-6" onSubmit={handleSubmit}>
+      {error && (
+        <div className='mb-4 text-sm text-red-600 bg-red-100 border border-red-400 rounded p-2'>
+          {error}
+        </div>
+      )}
+      <form className='space-y-6' onSubmit={handleSubmit}>
         <div>
-          <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+          <label htmlFor='name' className='block text-sm font-medium text-gray-700'>
             Name
           </label>
-          <div className="mt-1">
+          <div className='mt-1'>
             <input
-              id="name"
-              name="name"
-              type="text"
-              autoComplete="name"
+              id='name'
+              name='name'
+              type='text'
+              autoComplete='name'
               required
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              className='appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm'
             />
           </div>
         </div>
 
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+          <label htmlFor='email' className='block text-sm font-medium text-gray-700'>
             Email address
           </label>
-          <div className="mt-1">
+          <div className='mt-1'>
             <input
-              id="email"
-              name="email"
-              type="email"
-              autoComplete="email"
+              id='email'
+              name='email'
+              type='email'
+              autoComplete='email'
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              className='appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm'
             />
           </div>
         </div>
 
         <div>
-          <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+          <label htmlFor='password' className='block text-sm font-medium text-gray-700'>
             Password
           </label>
-          <div className="mt-1">
+          <div className='mt-1'>
             <input
-              id="password"
-              name="password"
-              type="password"
-              autoComplete="new-password"
+              id='password'
+              name='password'
+              type='password'
+              autoComplete='new-password'
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              className='appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm'
             />
           </div>
         </div>
 
         <div>
-          <label htmlFor="confirm-password" className="block text-sm font-medium text-gray-700">
+          <label htmlFor='confirm-password' className='block text-sm font-medium text-gray-700'>
             Confirm Password
           </label>
-          <div className="mt-1">
+          <div className='mt-1'>
             <input
-              id="confirm-password"
-              name="confirm-password"
-              type="password"
-              autoComplete="new-password"
+              id='confirm-password'
+              name='confirm-password'
+              type='password'
+              autoComplete='new-password'
               required
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              className='appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm'
             />
           </div>
         </div>
 
         <div>
           <button
-            type="submit"
-            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            type='submit'
+            className='w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'
           >
             Sign up
           </button>
