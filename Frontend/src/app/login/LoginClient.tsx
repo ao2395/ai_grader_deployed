@@ -3,20 +3,27 @@ import { useEffect } from "react";
 
 const useGoogleOAuth = () => {
   const router = useRouter();
-  const searchParams = new URLSearchParams(window.location.search);
 
   useEffect(() => {
-    // Check if we have a token from Google OAuth callback
-    const token = searchParams.get("token");
-    if (token) {
-      localStorage.setItem("token", token);
-      router.push("/learner-home");
+    if (typeof window !== "undefined") {
+      // Create searchParams inside useEffect to avoid dependency issues
+      const searchParams = new URLSearchParams(window.location.search);
+
+      // Check if we have a token from Google OAuth callback
+      const token = searchParams.get("token");
+      if (token) {
+        localStorage.setItem("token", token);
+        router.push("/learner-home");
+      }
     }
-  }, [router, searchParams]);
+  }, [router]);
 
   const handleGoogleLogin = async () => {
     try {
-      window.location.href = "https://backend-839795182838.us-central1.run.app/api/v1/auth/google";
+      if (typeof window !== "undefined") {
+        window.location.href =
+          "https://backend-839795182838.us-central1.run.app/api/v1/auth/google";
+      }
     } catch (error) {
       console.error("Error during Google login:", error);
     }
