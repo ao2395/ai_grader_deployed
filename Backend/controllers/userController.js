@@ -76,10 +76,14 @@ const loginUser = async (req, res, next) => {
       if (err) {
         return next(err);
       }
-      req.session.userId = user.id;
-      return res.json({
-        message: "Logged in successfully",
-        user: { id: user.id, name: user.name, email: user.email },
+      req.session.save((err) => {
+        if (err) {
+          return next(err);
+        }
+        return res.json({
+          message: "Logged in successfully",
+          user: { id: user.id, name: user.name, email: user.email },
+        });
       });
     });
   } catch (error) {
