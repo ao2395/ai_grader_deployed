@@ -21,7 +21,7 @@ async function transcribeAudio(audioFilePath) {
   try {
     const transcription = await client.audio.transcriptions.create({
       model: "whisper-1",
-      file: fs.createReadStream(audioFilePath)
+      file: fs.createReadStream(audioFilePath),
     });
     return transcription.text;
   } catch (error) {
@@ -32,13 +32,6 @@ async function transcribeAudio(audioFilePath) {
     fs.unlinkSync(audioFilePath);
   }
 }
-
-
-
-
-
-
-
 
 // const transcribeAudio = (filePath) => {
 //   return new Promise((resolve, reject) => {
@@ -68,9 +61,6 @@ async function transcribeAudio(audioFilePath) {
 //     });
 //   });
 // };
-
-
-
 
 const sendToGrading = async (gradingData) => {
   try {

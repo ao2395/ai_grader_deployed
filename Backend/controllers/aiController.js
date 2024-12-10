@@ -107,14 +107,6 @@ async function gradeSubmission(imagePath, transcription, question, officialAnswe
   }
 }
 
-
-
-
-
-
-
-
-
 //   async function processSubmission(imagePath, audioPath, question, officialAnswer) {
 //     try {
 //       // Step 1: Transcribe the audio
