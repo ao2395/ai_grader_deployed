@@ -4,7 +4,6 @@ import { useState, Suspense } from "react";
 import { useRouter } from "next/navigation";
 import { FcGoogle } from "react-icons/fc";
 import useGoogleOAuth from "./LoginClient";
-import { log } from "console";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
