@@ -44,7 +44,6 @@ export default function FeedbackPage() {
   const [error, setError] = useState<string | null>(null);
   const [totalQuestions, setTotalQuestions] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
-  const [userId, setUserId] = useState<string>("");
 
   const saveResponse = async (feedbackData: FeedbackData, questionId: string, userId: string) => {
     try {
@@ -88,7 +87,6 @@ export default function FeedbackPage() {
         if (!storedUserId) {
           throw new Error("No user ID found in cookies");
         }
-        setUserId(storedUserId);
 
         // Fetch questions data
         const questionResponse = await authenticatedFetch(
