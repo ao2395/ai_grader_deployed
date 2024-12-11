@@ -188,7 +188,6 @@ export default function PracticePage() {
               <Canvas />
             </div>
             <br />
-            <SubmitButton onClick={handleSubmit} />
           </div>
         </div>
         <Footer />
