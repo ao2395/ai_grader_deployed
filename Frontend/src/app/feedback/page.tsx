@@ -177,7 +177,7 @@ export default function FeedbackPage() {
         if (isNaN(questionIndex) || questionIndex < 0 || questionIndex >= questions.length) {
           throw new Error("Invalid question index");
         }
-        const submittedQuestionId = localStorage.getItem("submittedQuestionId");
+
         const currentQuestion = questions[questionIndex];
         console.log("Current Question:", currentQuestion); // Debugging line
 
