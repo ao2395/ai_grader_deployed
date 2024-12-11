@@ -178,8 +178,7 @@ export default function FeedbackPage() {
           throw new Error("Invalid question index");
         }
         const submittedQuestionId = localStorage.getItem("submittedQuestionId");
-        const currentQuestion = questions.find((q) => q._id === submittedQuestionId);
-        // const currentQuestion = questions[questionIndex];
+        const currentQuestion = questions[questionIndex];
         console.log("Current Question:", currentQuestion); // Debugging line
 
         if (isMounted && currentQuestion) {

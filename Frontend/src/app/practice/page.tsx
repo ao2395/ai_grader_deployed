@@ -63,7 +63,6 @@ export default function PracticePage() {
           setCurrentQuestionIndex(0);
           localStorage.setItem("currentQuestionIndex", "0");
         }
-        localStorage.setItem("submittedQuestionId", questions[currentQuestionIndex]._id);
       } catch (error) {
         console.error("Error loading questions:", error);
         setError("Failed to load questions. Please try again later.");
