@@ -173,21 +173,19 @@ export default function Canvas() {
   const saveAudio = async () => {
     if (audioChunksRef.current.length > 0) {
       const audioBlob = new Blob(audioChunksRef.current, { type: "audio/wav" });
-  
+
       const formData1 = new FormData();
       const formData2 = new FormData();
-      
+
       const currentDate = new Date();
-      const formattedDate = currentDate.toISOString().split('T')[0];
-      const formattedTime = currentDate.toTimeString().split(' ')[0].replace(/:/g, '');
+      const formattedDate = currentDate.toISOString().split("T")[0];
+      const formattedTime = currentDate.toTimeString().split(" ")[0].replace(/:/g, "");
       const fileName = `recorded_audio_${formattedDate}_${formattedTime}.wav`;
 
-      
-      
       // Append the same file to both FormData objects
       formData1.append("file", audioBlob, fileName);
       formData2.append("file", audioBlob, fileName);
-  
+
       try {
         // Upload to both storages in parallel
         const [regularUpload, researchUpload] = await Promise.all([
@@ -204,25 +202,25 @@ export default function Canvas() {
               method: "POST",
               body: formData2,
             }
-          )
+          ),
         ]);
-  
+
         // Download the file locally
         downloadFile(audioBlob, "recorded_audio.wav");
-  
+
         // Parse both responses
         const [regularData, researchData] = await Promise.all([
           regularUpload.json(),
-          researchUpload.json()
+          researchUpload.json(),
         ]);
-  
+
         if (regularUpload.ok && researchUpload.ok) {
           console.log("Regular upload successful:", regularData.publicUrl);
           console.log("Research upload successful:", researchData.publicUrl);
         } else {
           console.error("Failed to upload to one or more locations:", {
             regular: regularUpload.ok ? "Success" : "Failed",
-            research: researchUpload.ok ? "Success" : "Failed"
+            research: researchUpload.ok ? "Success" : "Failed",
           });
         }
       } catch (error) {

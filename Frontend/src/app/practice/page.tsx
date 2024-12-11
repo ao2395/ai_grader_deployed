@@ -32,7 +32,6 @@ export default function PracticePage() {
   const [questions, setQuestions] = useState<QuestionData[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
-  const [totalQuestions, setTotalQuestions] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
@@ -48,20 +47,21 @@ export default function PracticePage() {
         }
         const data = await response.json();
         setQuestions(data);
-        setTotalQuestions(data.length);
+        //setTotalQuestions(data.length);
 
-        // const storedIndex = localStorage.getItem("currentQuestionIndex");
-        // if (storedIndex !== null) {
-        //   const parsedIndex = parseInt(storedIndex, 10);
-        //   if (!isNaN(parsedIndex) && parsedIndex >= 0 && parsedIndex < data.length) {
-        //     setCurrentQuestionIndex(parsedIndex);
-        //   }
-        // }
         const storedIndex = localStorage.getItem("currentQuestionIndex");
-        if (storedIndex === null) throw new Error("No question index found in localStorage");
-
-        const questionIndex = parseInt(storedIndex, 10);
-        const currentQuestion = data[questionIndex];
+        if (storedIndex !== null) {
+          const parsedIndex = parseInt(storedIndex, 10);
+          if (!isNaN(parsedIndex) && parsedIndex >= 0 && parsedIndex < data.length) {
+            setCurrentQuestionIndex(parsedIndex);
+          } else {
+            setCurrentQuestionIndex(0);
+            localStorage.setItem("currentQuestionIndex", "0");
+          }
+        } else {
+          setCurrentQuestionIndex(0);
+          localStorage.setItem("currentQuestionIndex", "0");
+        }
       } catch (error) {
         console.error("Error loading questions:", error);
         setError("Failed to load questions. Please try again later.");
@@ -138,76 +138,20 @@ export default function PracticePage() {
     }
   };
 
-  // const handleSubmit = async () => {
-  //   const canvasElement = document.querySelector("canvas");
-
-  //   if (canvasElement) {
-  //     canvasElement.toBlob(async (blob) => {
-  //       if (blob) {
-  //         const formData1 = new FormData();
-  //         const formData2 = new FormData();
-
-  //         const currentDate = new Date();
-  //         const formattedDate = currentDate.toISOString().split('T')[0];
-  //         const formattedTime = currentDate.toTimeString().split(' ')[0].replace(/:/g, '');
-  //         const fileName = `${questions[currentQuestionIndex]._id}_${formattedDate}_${formattedTime}.png`;
-  //         // Append the same file to both FormData objects
-  //         formData1.append('file', blob, fileName);
-  //         formData2.append('file', blob, fileName);
-
-  //         //formData.append("file", blob, `${questions[currentQuestionIndex]._id}.png`);
-
-  //         try {
-  //           const response = await authenticatedFetch(
-  //             "https://backend-839795182838.us-central1.run.app/api/v1/upload/image",
-  //             {
-  //               method: "POST",
-  //               body: formData1,
-  //             }
-  //           );
-
-  //           const data = await response.json();
-
-  //           if (response.ok) {
-  //             console.log("Image uploaded successfully:", data.publicUrl);
-  //             localStorage.setItem("currentQuestionIndex", currentQuestionIndex.toString());
-  //             router.push("/feedback");
-  //           } else {
-  //             console.error("Failed to upload image:", data.message || "Unknown error");
-  //           }
-  //         } catch (error) {
-  //           console.error("Error uploading image:", error);
-  //         }
-  //       } else {
-  //         console.error("Failed to retrieve canvas content.");
-  //       }
-  //     }, "image/png");
-  //   } else {
-  //     console.error("Canvas element not found.");
-  //   }
-  // };
-
   const handleNextQuestion = () => {
-    // setCurrentQuestionIndex((prevIndex) => {
-    //   const nextIndex = prevIndex === questions.length - 1 ? 0 : prevIndex + 1;
-    //   localStorage.setItem("currentQuestionIndex", nextIndex.toString());
-    //   return nextIndex;
-    // });
-    const currentIndex = parseInt(localStorage.getItem("currentQuestionIndex") || "0", 10);
-    const nextIndex = (currentIndex + 1) % totalQuestions;
-    localStorage.setItem("currentQuestionIndex", nextIndex.toString());
-    // router.push("/practice");
+    setCurrentQuestionIndex((prevIndex) => {
+      const nextIndex = (prevIndex + 1) % questions.length;
+      localStorage.setItem("currentQuestionIndex", nextIndex.toString());
+      return nextIndex;
+    });
   };
 
   const handlePreviousQuestion = () => {
-    // setCurrentQuestionIndex((prevIndex) => {
-    //   const newIndex = prevIndex === 0 ? questions.length - 1 : prevIndex - 1;
-    //   localStorage.setItem("currentQuestionIndex", newIndex.toString());
-    //   return newIndex;
-    // });
-    const currentIndex = parseInt(localStorage.getItem("currentQuestionIndex") || "0", 10);
-    const previousIndex = (currentIndex - 1 + totalQuestions) % totalQuestions;
-    localStorage.setItem("currentQuestionIndex", previousIndex.toString());
+    setCurrentQuestionIndex((prevIndex) => {
+      const previousIndex = (prevIndex - 1 + questions.length) % questions.length;
+      localStorage.setItem("currentQuestionIndex", previousIndex.toString());
+      return previousIndex;
+    });
   };
 
   if (isLoading) {
