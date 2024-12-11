@@ -75,6 +75,74 @@ export default function FeedbackPage() {
     }
   };
 
+  // useEffect(() => {
+  //   let isMounted = true;
+
+  //   const loadData = async () => {
+  //     try {
+  //       setIsLoading(true);
+
+  //       // Get userId from cookies
+  //       const storedUserId = Cookies.get("userId");
+  //       if (!storedUserId) {
+  //         throw new Error("No user ID found in cookies");
+  //       }
+
+  //       // Fetch questions data
+  //       const questionResponse = await authenticatedFetch(
+  //         "https://backend-839795182838.us-central1.run.app/api/v1/questions"
+  //       );
+  //       if (!questionResponse.ok) throw new Error(`HTTP error! status: ${questionResponse.status}`);
+
+  //       const questionData = await questionResponse.json();
+  //       setTotalQuestions(questionData.length);
+
+  //       // Get current question index from localStorage
+  //       const storedIndex = localStorage.getItem("currentQuestionIndex");
+  //       if (storedIndex === null) throw new Error("No question index found in localStorage");
+
+  //       const questionIndex = parseInt(storedIndex, 10);
+  //       const currentQuestion = questionData[questionIndex];
+
+  //       if (isMounted && currentQuestion) {
+  //         setQuestionData(currentQuestion);
+
+  //         const feedbackResponse = await authenticatedFetch(
+  //           `https://backend-839795182838.us-central1.run.app/api/v1/submit`,
+  //           {
+  //             method: "POST",
+  //             body: JSON.stringify({
+  //               questionId: currentQuestion._id,
+  //               userId: storedUserId,
+  //             }),
+  //           }
+  //         );
+
+  //         if (feedbackResponse.ok) {
+  //           const feedbackData = await feedbackResponse.json();
+  //           setFeedbackData(feedbackData);
+  //           await saveResponse(feedbackData, currentQuestion._id, storedUserId);
+  //         } else {
+  //           throw new Error(`HTTP error! status: ${feedbackResponse.status}`);
+  //         }
+  //       } else if (isMounted) {
+  //         setError(`Question with index ${questionIndex} not found`);
+  //       }
+  //     } catch (err) {
+  //       console.error("Error loading data:", err);
+  //       setError(`Error loading data. ${err instanceof Error ? err.message : "Please try again."}`);
+  //     } finally {
+  //       if (isMounted) setIsLoading(false);
+  //     }
+  //   };
+
+  //   loadData();
+
+  //   return () => {
+  //     isMounted = false;
+  //   };
+  // }, []);
+
   useEffect(() => {
     let isMounted = true;
 
@@ -94,15 +162,24 @@ export default function FeedbackPage() {
         );
         if (!questionResponse.ok) throw new Error(`HTTP error! status: ${questionResponse.status}`);
 
-        const questionData = await questionResponse.json();
-        setTotalQuestions(questionData.length);
+        const questions: QuestionData[] = await questionResponse.json();
+        setTotalQuestions(questions.length);
 
         // Get current question index from localStorage
         const storedIndex = localStorage.getItem("currentQuestionIndex");
+        console.log("Stored Question Index:", storedIndex); // Debugging line
         if (storedIndex === null) throw new Error("No question index found in localStorage");
 
         const questionIndex = parseInt(storedIndex, 10);
-        const currentQuestion = questionData[questionIndex];
+        console.log("Parsed Question Index:", questionIndex); // Debugging line
+
+        // Validate questionIndex
+        if (isNaN(questionIndex) || questionIndex < 0 || questionIndex >= questions.length) {
+          throw new Error("Invalid question index");
+        }
+
+        const currentQuestion = questions[questionIndex];
+        console.log("Current Question:", currentQuestion); // Debugging line
 
         if (isMounted && currentQuestion) {
           setQuestionData(currentQuestion);
@@ -111,6 +188,7 @@ export default function FeedbackPage() {
             `https://backend-839795182838.us-central1.run.app/api/v1/submit`,
             {
               method: "POST",
+              headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
                 questionId: currentQuestion._id,
                 userId: storedUserId,
