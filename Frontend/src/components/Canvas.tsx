@@ -5,11 +5,17 @@ import dynamic from "next/dynamic";
 import { Button } from "@/components/ui/button";
 import p5Types from "p5";
 import { authenticatedFetch } from "@/app/utils/api";
-
+import SubmitButton from "@/components/ui/submit-button";
+import { useRouter } from "next/navigation";
 const Sketch = dynamic(() => import("react-p5").then((mod) => mod.default), {
   ssr: false,
 });
-
+interface QuestionData {
+  _id: string;
+  question: string;
+  answer: string;
+  module: string;
+}
 export default function Canvas() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -20,7 +26,13 @@ export default function Canvas() {
   const p5InstanceRef = useRef<p5Types | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
-
+  const router = useRouter();
+  const [questions, setQuestions] = useState<QuestionData[]>([]);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [isLoading, setIsLoading] = useState(true);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [error, setError] = useState<string | null>(null);
   const preventScroll = useCallback(
     (e: TouchEvent) => {
       if (isDrawing) {
@@ -230,7 +242,109 @@ export default function Canvas() {
       console.log("No audio recorded yet");
     }
   };
+  useEffect(() => {
+    const loadQuestions = async () => {
+      try {
+        setIsLoading(true);
+        const response = await authenticatedFetch(
+          "https://backend-839795182838.us-central1.run.app/api/v1/questions"
+        );
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        setQuestions(data);
+        //setTotalQuestions(data.length);
 
+        const storedIndex = localStorage.getItem("currentQuestionIndex");
+        if (storedIndex !== null) {
+          const parsedIndex = parseInt(storedIndex, 10);
+          if (!isNaN(parsedIndex) && parsedIndex >= 0 && parsedIndex < data.length) {
+            setCurrentQuestionIndex(parsedIndex);
+          } else {
+            setCurrentQuestionIndex(0);
+            localStorage.setItem("currentQuestionIndex", "0");
+          }
+        } else {
+          setCurrentQuestionIndex(0);
+          localStorage.setItem("currentQuestionIndex", "0");
+        }
+      } catch (error) {
+        console.error("Error loading questions:", error);
+        setError("Failed to load questions. Please try again later.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    loadQuestions();
+  }, []);
+
+  const handleSubmit = async () => {
+    await saveAudio()
+    const canvasElement = document.querySelector("canvas");
+
+    if (canvasElement) {
+      canvasElement.toBlob(async (blob) => {
+        if (blob) {
+          const formData1 = new FormData();
+          const formData2 = new FormData();
+
+          const currentDate = new Date();
+          const formattedDate = currentDate.toISOString().split("T")[0];
+          const formattedTime = currentDate.toTimeString().split(" ")[0].replace(/:/g, "");
+          const fileName = `${questions[currentQuestionIndex]._id}_${formattedDate}_${formattedTime}.png`;
+
+          // Append the same file to both FormData objects
+          formData1.append("file", blob, fileName);
+          formData2.append("file", blob, fileName);
+
+          try {
+            // Upload to both storages in parallel
+            const [regularUpload, researchUpload] = await Promise.all([
+              authenticatedFetch(
+                "https://backend-839795182838.us-central1.run.app/api/v1/upload/image",
+                {
+                  method: "POST",
+                  body: formData1,
+                }
+              ),
+              authenticatedFetch(
+                "https://backend-839795182838.us-central1.run.app/api/v1/upload/research/image",
+                {
+                  method: "POST",
+                  body: formData2,
+                }
+              ),
+            ]);
+
+            // Parse both responses
+            const [regularData, researchData] = await Promise.all([
+              regularUpload.json(),
+              researchUpload.json(),
+            ]);
+
+            if (regularUpload.ok && researchUpload.ok) {
+              console.log("Regular upload successful:", regularData.publicUrl);
+              console.log("Research upload successful:", researchData.publicUrl);
+              localStorage.setItem("currentQuestionIndex", currentQuestionIndex.toString());
+              router.push("/feedback");
+            } else {
+              console.error("Failed to upload to one or more locations:", {
+                regular: regularUpload.ok ? "Success" : "Failed",
+                research: researchUpload.ok ? "Success" : "Failed",
+              });
+            }
+          } catch (error) {
+            console.error("Error uploading image:", error);
+          }
+        } else {
+          console.error("Failed to retrieve canvas content.");
+        }
+      }, "image/png");
+    } else {
+      console.error("Canvas element not found.");
+    }
+  };
   // const downloadImage = () => {
   //   if (!canvasRef.current) return;
 
@@ -299,6 +413,7 @@ export default function Canvas() {
   //   }
   // };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const saveImage = async () => {
     const canvasBlob = await getCanvasBlob();
     if (canvasBlob) {
@@ -374,12 +489,8 @@ export default function Canvas() {
         <Button onClick={handleRecordingToggle} variant={isRecording ? "outline" : "default"}>
           {isRecording ? "Stop Recording" : "Start Recording"}
         </Button>
-        <Button onClick={saveImage} variant='default'>
-          Save Image
-        </Button>
-        <Button onClick={saveAudio} variant='default'>
-          Save Audio
-        </Button>
+        <br /><br></br><br></br>
+        <SubmitButton onClick={handleSubmit} />
       </div>
     </div>
   );

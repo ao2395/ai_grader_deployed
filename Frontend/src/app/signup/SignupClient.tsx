@@ -1,10 +1,8 @@
 // LoginClient.tsx
 
-import { useRouter } from "next/navigation";
 import { useCallback } from "react";
 
 const useGoogleOAuth = () => {
-  const router = useRouter();
 
   const handleGoogleSignup = useCallback(() => {
     try {
@@ -17,7 +15,7 @@ const useGoogleOAuth = () => {
       console.error("Error during Google login:", error);
       // Optionally, handle the error by showing a notification to the user
     }
-  }, [router]);
+  }, []);
 
   return { handleGoogleSignup };
 };
