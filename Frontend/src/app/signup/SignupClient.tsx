@@ -1,33 +1,23 @@
+// LoginClient.tsx
+
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useCallback } from "react";
 
 const useGoogleOAuth = () => {
   const router = useRouter();
 
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      // Initialize searchParams inside the effect to avoid dependency issues
-      const searchParams = new URLSearchParams(window.location.search);
-
-      // Check if we have a token from Google OAuth callback
-      const token = searchParams.get("token");
-      if (token) {
-        localStorage.setItem("token", token);
-        router.push("/learner-home");
-      }
-    }
-  }, [router]);
-
-  const handleGoogleSignup = async () => {
+  const handleGoogleSignup = useCallback(() => {
     try {
       if (typeof window !== "undefined") {
+        // Initiate the Google OAuth flow
         window.location.href =
           "https://backend-839795182838.us-central1.run.app/api/v1/auth/google";
       }
     } catch (error) {
-      console.error("Error during Google signup:", error);
+      console.error("Error during Google login:", error);
+      // Optionally, handle the error by showing a notification to the user
     }
-  };
+  }, [router]);
 
   return { handleGoogleSignup };
 };
