@@ -7,6 +7,7 @@ import PracticePageSubheader from "@/components/PracticePageSubheader";
 import ModeToggle from "@/components/ModeToggle";
 import Canvas from "@/components/Canvas";
 import Footer from "@/components/Footer";
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import SubmitButton from "@/components/ui/submit-button";
 import QuestionNavigation from "@/components/QuestionNavigation";
 import LearnerHeader from "@/components/LearnerHeader";
@@ -72,6 +73,7 @@ export default function PracticePage() {
     loadQuestions();
   }, []);
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleSubmit = async () => {
     const canvasElement = document.querySelector("canvas");
 
