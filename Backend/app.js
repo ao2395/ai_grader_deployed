@@ -25,7 +25,7 @@ if (process.env.NODE_ENV !== "deployment") {
   app.use(morgan("dev"));
   app.use(cors({ origin: `http://localhost:3001`, credentials: true }));
 } else {
-  app.use(cors({ origin: `https://frontend-839795182838.us-central1.run.app`, credentials: true }));
+  app.use(cors({ origin: [`https://frontend-839795182838.us-central1.run.app`,`https://drawexplain.com`], credentials: true }));
   const limiter = rateLimit({
     max: 200,
     windowMs: 3 * 60 * 1000,
