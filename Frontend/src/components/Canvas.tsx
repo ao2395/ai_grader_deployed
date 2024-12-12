@@ -361,7 +361,8 @@ export default function Canvas() {
   
       // Navigate to Feedback Page
       localStorage.setItem("currentQuestionIndex", currentQuestionIndex.toString());
-      localStorage.setItem("questionID", questionId)
+      let qid=questions[currentQuestionIndex]._id;
+      localStorage.setItem("questionID", qid)
       router.push("/feedback");
     }, "image/png");
     
