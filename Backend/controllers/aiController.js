@@ -209,7 +209,15 @@ async function processSubmission(bucketName, questionId, userId) {
       filename.startsWith(`${questionId}_${userId}_`)
     );
 
-
+    const extractTimestamp = (filename) => {
+      const match = filename.match(/_(\d{4}-\d{2}-\d{2})_(\d{6})\.(wav|png)$/);
+      return match ? `${match[1]}_${match[2]}` : null;
+    };
+    filteredFilenames.sort((a, b) => {
+      const timestampA = extractTimestamp(a);
+      const timestampB = extractTimestamp(b);
+      return timestampB.localeCompare(timestampA);
+    });
     let imageFilename = null;
     let audioFilename = null;
 
