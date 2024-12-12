@@ -6,6 +6,7 @@ const compression = require("compression");
 const rateLimit = require("express-rate-limit");
 const helmet = require("helmet");
 const passport = require("passport");
+
 const examRouter = require("./routes/examRoutes");
 const questionRouter = require("./routes/questionRoutes");
 const responseRouter = require("./routes/responseRoutes");
@@ -15,10 +16,9 @@ const authRouter = require("./routes/authRoutes");
 const submitRouter = require("./routes/aiRoutes");
 const gcsRouter = require("./routes/gcsRoutes");
 
-// express app
 const app = express();
 
-// middlewares
+// Middlewares
 app.use(helmet());
 
 if (process.env.NODE_ENV !== "deployment") {
@@ -33,13 +33,12 @@ if (process.env.NODE_ENV !== "deployment") {
   });
   app.use("/api", limiter);
 }
+
 app.use(compression());
 app.use(express.json());
 
 // Passport middleware
 app.use(passport.initialize());
-
-// Passport configuration
 require("./controllers/authController")(passport);
 
 // Routes

@@ -7,15 +7,19 @@ import p5Types from "p5";
 import { authenticatedFetch } from "@/app/utils/api";
 import SubmitButton from "@/components/ui/submit-button";
 import { useRouter } from "next/navigation";
+import Cookies from "js-cookie";
+
 const Sketch = dynamic(() => import("react-p5").then((mod) => mod.default), {
   ssr: false,
 });
+
 interface QuestionData {
   _id: string;
   question: string;
   answer: string;
   module: string;
 }
+
 export default function Canvas() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -29,10 +33,11 @@ export default function Canvas() {
   const router = useRouter();
   const [questions, setQuestions] = useState<QuestionData[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // eslint-disable-next-line no-unused-vars
   const [isLoading, setIsLoading] = useState(true);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // eslint-disable-next-line no-unused-vars
   const [error, setError] = useState<string | null>(null);
+
   const preventScroll = useCallback(
     (e: TouchEvent) => {
       if (isDrawing) {
@@ -173,7 +178,6 @@ export default function Canvas() {
     }
   }, []);
 
-
   const saveAudio = async () => {
     if (audioChunksRef.current.length > 0) {
       return new Blob(audioChunksRef.current, { type: "audio/wav" });
@@ -182,7 +186,7 @@ export default function Canvas() {
       return null;
     }
   };
-  
+
   useEffect(() => {
     const loadQuestions = async () => {
       try {
@@ -195,7 +199,6 @@ export default function Canvas() {
         }
         const data = await response.json();
         setQuestions(data);
-        //setTotalQuestions(data.length);
 
         const storedIndex = localStorage.getItem("currentQuestionIndex");
         if (storedIndex !== null) {
@@ -220,22 +223,81 @@ export default function Canvas() {
     loadQuestions();
   }, []);
 
+  const sendQuestionData = async (questionId: string) => {
+    const userId = Cookies.get("userId"); // Retrieve userId from cookies
+
+    if (!userId) {
+      console.error("User ID not found in cookies.");
+      return;
+    }
+
+    const payload = {
+      questionId: questionId,
+      userId: userId,
+    };
+
+    try {
+      const response = await authenticatedFetch(
+        "https://backend-839795182838.us-central1.run.app/api/v1/submit/question",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to submit question data.");
+      }
+
+      const data = await response.json();
+      console.log("Question data submitted successfully:", data);
+    } catch (error) {
+      console.error("Error submitting question data:", error);
+    }
+  };
+  // eslint-disable-next-line no-unused-vars
+  const getCanvasBlob = (): Promise<Blob | null> => {
+    return new Promise((resolve) => {
+      if (canvasRef.current) {
+        canvasRef.current.toBlob((blob) => {
+          resolve(blob);
+        }, "image/png");
+      } else {
+        resolve(null);
+      }
+    });
+  };
+
   const handleSubmit = async () => {
     const audioBlob = await saveAudio();
-    const canvasElement = document.querySelector("canvas");
-  
+
+    const questionId = questions[currentQuestionIndex]._id;
+    const userId = Cookies.get("userId");
+    if (!userId) {
+      console.error("User ID not found in cookies.");
+      return;
+    }
+
+    await sendQuestionData(questionId);
+
+    const currentDate = new Date();
+    const formattedDate = currentDate.toISOString().split("T")[0];
+    const formattedTime = currentDate.toTimeString().split(" ")[0].replace(/:/g, "");
+
+    const audioFileName = `${questionId}_${userId}_${formattedDate}_${formattedTime}.wav`;
+    const imageFileName = `${questionId}_${userId}_${formattedDate}_${formattedTime}.png`;
+
+    // Upload Audio
     if (audioBlob) {
       const formData1 = new FormData();
       const formData2 = new FormData();
-  
-      const currentDate = new Date();
-      const formattedDate = currentDate.toISOString().split("T")[0];
-      const formattedTime = currentDate.toTimeString().split(" ")[0].replace(/:/g, "");
-      const audioFileName = `recorded_audio_${formattedDate}_${formattedTime}.wav`;
-  
       formData1.append("file", audioBlob, audioFileName);
       formData2.append("file", audioBlob, audioFileName);
-  
+
       try {
         // Upload audio to both endpoints
         await Promise.all([
@@ -253,155 +315,53 @@ export default function Canvas() {
         return;
       }
     }
-  
-    if (canvasElement) {
-      canvasElement.toBlob(async (blob) => {
-        if (blob) {
-          const formData1 = new FormData();
-          const formData2 = new FormData();
-  
-          const currentDate = new Date();
-          const formattedDate = currentDate.toISOString().split("T")[0];
-          const formattedTime = currentDate.toTimeString().split(" ")[0].replace(/:/g, "");
-          const imageFileName = `${questions[currentQuestionIndex]._id}_${formattedDate}_${formattedTime}.png`;
-  
-          formData1.append("file", blob, imageFileName);
-          formData2.append("file", blob, imageFileName);
-  
-          try {
-            // Upload image to both endpoints
-            const [regularUpload, researchUpload] = await Promise.all([
-              authenticatedFetch(
-                "https://backend-839795182838.us-central1.run.app/api/v1/upload/image",
-                { method: "POST", body: formData1 }
-              ),
-              authenticatedFetch(
-                "https://backend-839795182838.us-central1.run.app/api/v1/upload/research/image",
-                { method: "POST", body: formData2 }
-              ),
-            ]);
-  
-            const [regularData, researchData] = await Promise.all([
-              regularUpload.json(),
-              researchUpload.json(),
-            ]);
-  
-            if (regularUpload.ok && researchUpload.ok) {
-              console.log("Regular upload successful:", regularData.publicUrl);
-              console.log("Research upload successful:", researchData.publicUrl);
-              localStorage.setItem("currentQuestionIndex", currentQuestionIndex.toString());
-              router.push("/feedback");
-            } else {
-              console.error("Failed to upload to one or more locations");
-            }
-          } catch (error) {
-            console.error("Error uploading image:", error);
-          }
-        } else {
-          console.error("Failed to retrieve canvas content.");
-        }
-      }, "image/png");
-    } else {
+
+    const canvasElement = document.querySelector("canvas");
+    if (!canvasElement) {
       console.error("Canvas element not found.");
+      return;
     }
-  };
-  
-  // const downloadImage = () => {
-  //   if (!canvasRef.current) return;
 
-  //   const canvas = canvasRef.current;
-  //   const link = document.createElement('a');
-  //   link.download = 'canvas_sections.png';
-  //   link.href = canvas.toDataURL('image/png');
-  //   link.click();
-  // };
+    canvasElement.toBlob(async (blob) => {
+      if (blob) {
+        const formData1 = new FormData();
+        const formData2 = new FormData();
+        formData1.append("file", blob, imageFileName);
+        formData2.append("file", blob, imageFileName);
 
-  // const saveAudio = () => {
-  //   if (audioChunksRef.current.length > 0) {
-  //     const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
-  //     downloadFile(audioBlob, 'recorded_audio.wav');
-  //   } else {
-  //     console.log('No audio recorded yet');
-  //   }
-  // };
+        try {
+          // Upload image to both endpoints
+          const [regularUpload, researchUpload] = await Promise.all([
+            authenticatedFetch(
+              "https://backend-839795182838.us-central1.run.app/api/v1/upload/image",
+              { method: "POST", body: formData1 }
+            ),
+            authenticatedFetch(
+              "https://backend-839795182838.us-central1.run.app/api/v1/upload/research/image",
+              { method: "POST", body: formData2 }
+            ),
+          ]);
 
-  // const saveAudio = async () => {
-  //   if (audioChunksRef.current.length > 0) {
-  //     const audioBlob = new Blob(audioChunksRef.current, { type: "audio/wav" });
+          const [regularData, researchData] = await Promise.all([
+            regularUpload.json(),
+            researchUpload.json(),
+          ]);
 
-  //     const formData = new FormData();
-  //     const timestamp = Date.now();
-  //     formData.append("file", audioBlob, `${timestamp}_nopw___tryryryrecorded_audio.wav`);
-
-  //     try {
-  //       const response = await authenticatedFetch(
-  //         "https://backend-839795182838.us-central1.run.app/api/v1/upload/audio",
-  //         {
-  //           method: "POST",
-  //           body: formData,
-  //         }
-  //       );
-  //       downloadFile(audioBlob, "recorded_audio.wav");
-
-  //       const data = await response.json();
-  //       if (response.ok) {
-  //         console.log("Audio uploaded successfully:", data.publicUrl);
-  //       } else {
-  //         console.error("Failed to upload audio:", data.message || "Unknown error");
-  //       }
-  //     } catch (error) {
-  //       console.error("Error uploading audio:", error);
-  //     }
-  //   } else {
-  //     console.log("No audio recorded yet");
-  //   }
-  // };
-
-  // const saveImage = () => {
-  //   downloadImage();
-  // };
-  // const saveImage = async () => {
-  //   const canvasBlob = await getCanvasBlob();
-  //   if (canvasBlob) {
-  //     const url = URL.createObjectURL(canvasBlob);
-  //     const link = document.createElement('a');
-  //     link.href = url;
-  //     link.download = 'canvas_sections.png';
-  //     link.click();
-  //     URL.revokeObjectURL(url);
-  //   } else {
-  //     console.error('Failed to retrieve canvas content.');
-  //   }
-  // };
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const saveImage = async () => {
-    const canvasBlob = await getCanvasBlob();
-    if (canvasBlob) {
-      const formData = new FormData();
-      formData.append("file", canvasBlob, "c333anvasImage.png");
-
-      try {
-        const response = await authenticatedFetch(
-          "https://backend-839795182838.us-central1.run.app/api/v1/upload/image",
-          {
-            method: "POST",
-            body: formData,
+          if (regularUpload.ok && researchUpload.ok) {
+            console.log("Regular upload successful:", regularData.publicUrl);
+            console.log("Research upload successful:", researchData.publicUrl);
+            localStorage.setItem("currentQuestionIndex", currentQuestionIndex.toString());
+            router.push("/feedback");
+          } else {
+            console.error("Failed to upload to one or more locations");
           }
-        );
-
-        const data = await response.json();
-        if (response.ok) {
-          console.log("Image uploaded successfully:", data.publicUrl);
-        } else {
-          console.error("Failed to upload image:", data.message || "Unknown error");
+        } catch (error) {
+          console.error("Error uploading image:", error);
         }
-      } catch (error) {
-        console.error("Error uploading image:", error);
+      } else {
+        console.error("Failed to retrieve canvas content.");
       }
-    } else {
-      console.error("Failed to retrieve canvas content.");
-    }
+    }, "image/png");
   };
 
   const handleRecordingToggle = () => {
@@ -410,18 +370,6 @@ export default function Canvas() {
     } else {
       startRecording();
     }
-  };
-
-  const getCanvasBlob = (): Promise<Blob | null> => {
-    return new Promise((resolve) => {
-      if (canvasRef.current) {
-        canvasRef.current.toBlob((blob) => {
-          resolve(blob);
-        }, "image/png");
-      } else {
-        resolve(null);
-      }
-    });
   };
 
   return (
@@ -450,7 +398,7 @@ export default function Canvas() {
         <Button onClick={handleRecordingToggle} variant={isRecording ? "outline" : "default"}>
           {isRecording ? "Stop Recording" : "Start Recording"}
         </Button>
-        <br /><br></br><br></br>
+        <br /><br /><br />
         <SubmitButton onClick={handleSubmit} />
       </div>
     </div>
