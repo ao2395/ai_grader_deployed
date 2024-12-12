@@ -40,7 +40,7 @@ export async function authenticatedFetch(
         window.location.href = "/signup";
         throw new Error("Unauthorized");
       }
-      throw new Error(`HTTP error! status: ${response.status}`);
+      throw new Error(`HTTP error! status, api: ${response.status}`);
     }
 
     return response;
