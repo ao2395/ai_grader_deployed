@@ -342,7 +342,6 @@ export default function Canvas() {
           if (regularUpload.ok && researchUpload.ok) {
             console.log("Regular upload successful:", regularData.publicUrl);
             console.log("Research upload successful:", researchData.publicUrl);
-            localStorage.setItem("currentQuestionIndex", currentQuestionIndex.toString());
           } else {
             console.error("Failed to upload to one or more locations");
           }
