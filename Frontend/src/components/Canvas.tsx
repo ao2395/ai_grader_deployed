@@ -232,8 +232,14 @@ export default function Canvas() {
 
   const handleSubmit = async () => {
     const audioBlob = await saveAudio();
-
-    const questionId = questions[currentQuestionIndex]._id;;
+    const currentQuestionIndex = localStorage.getItem("currentQuestionIndex") || "0";
+    const parsedIndex = parseInt(currentQuestionIndex, 10);
+    
+    if (isNaN(parsedIndex)) {
+      console.error("Invalid currentQuestionIndex in localStorage, resetting to 0");
+      localStorage.setItem("currentQuestionIndex", "0");
+    }
+    const questionId = questions[parsedIndex]._id;;
     const userId = Cookies.get("userId");
     if (!userId) {
       console.error("User ID not found in cookies.");
@@ -326,7 +332,7 @@ export default function Canvas() {
   
       // Navigate to Feedback Page
       localStorage.setItem("currentQuestionIndex", currentQuestionIndex.toString());
-      let qid=questions[currentQuestionIndex]._id;
+      const qid=questions[parsedIndex]._id;
       localStorage.setItem("questionID", qid)
       router.push("/feedback");
     }, "image/png");
