@@ -269,6 +269,7 @@ export default function Canvas() {
     const audioBlob = await saveAudio();
 
     const questionId = questions[currentQuestionIndex]._id;
+    localStorage.setItem("currentQuestionIndex", currentQuestionIndex.toString());
     localStorage.setItem("questionID", questionId);
     const userId = Cookies.get("userId");
     if (!userId) {
