@@ -192,6 +192,41 @@ export default function Canvas() {
     }
   };
 
+  useEffect(() => {
+    const loadQuestions = async () => {
+      try {
+        setIsLoading(true);
+        const response = await authenticatedFetch(
+          "https://backend-839795182838.us-central1.run.app/api/v1/questions"
+        );
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        setQuestions(data);
+
+        const storedIndex = localStorage.getItem("currentQuestionIndex");
+        if (storedIndex !== null) {
+          const parsedIndex = parseInt(storedIndex, 10);
+          if (!isNaN(parsedIndex) && parsedIndex >= 0 && parsedIndex < data.length) {
+            setCurrentQuestionIndex(parsedIndex);
+          } else {
+            setCurrentQuestionIndex(0);
+            localStorage.setItem("currentQuestionIndex", "0");
+          }
+        } else {
+          setCurrentQuestionIndex(0);
+          localStorage.setItem("currentQuestionIndex", "0");
+        }
+      } catch (error) {
+        console.error("Error loading questions:", error);
+        setError("Failed to load questions. Please try again later.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    loadQuestions();
+  }, []);
 
   const sendQuestionData = async (questionId: string, userId: string): Promise<FeedbackData | null> => {
     try {
@@ -232,14 +267,10 @@ export default function Canvas() {
 
   const handleSubmit = async () => {
     const audioBlob = await saveAudio();
-    const currentQuestionIndex = localStorage.getItem("currentQuestionIndex") || "0";
-    const parsedIndex = parseInt(currentQuestionIndex, 10);
-    
-    if (isNaN(parsedIndex)) {
-      console.error("Invalid currentQuestionIndex in localStorage, resetting to 0");
-      localStorage.setItem("currentQuestionIndex", "0");
-    }
-    const questionId = questions[parsedIndex]._id;;
+
+    const questionId = questions[currentQuestionIndex]._id;
+    localStorage.setItem("currentQuestionIndex", currentQuestionIndex.toString());
+    localStorage.setItem("questionID", questionId);
     const userId = Cookies.get("userId");
     if (!userId) {
       console.error("User ID not found in cookies.");
@@ -331,9 +362,6 @@ export default function Canvas() {
       localStorage.setItem("currentFeedback", JSON.stringify(feedback));
   
       // Navigate to Feedback Page
-      localStorage.setItem("currentQuestionIndex", currentQuestionIndex.toString());
-      const qid=questions[parsedIndex]._id;
-      localStorage.setItem("questionID", qid)
       router.push("/feedback");
     }, "image/png");
     
