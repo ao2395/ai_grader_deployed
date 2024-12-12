@@ -220,7 +220,6 @@ export default function Canvas({ currentQuestion, userId }: CanvasProps) {
     const audioBlob = await saveAudio();
 
     const questionId = currentQuestion._id;
-    // We now rely on parent for index; no need to set localStorage here
     const currentDate = new Date();
     const formattedDate = currentDate.toISOString().split("T")[0];
     const formattedTime = currentDate.toTimeString().split(" ")[0].replace(/:/g, "");
