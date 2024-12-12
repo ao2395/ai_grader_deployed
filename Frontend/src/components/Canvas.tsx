@@ -268,9 +268,7 @@ export default function Canvas() {
   const handleSubmit = async () => {
     const audioBlob = await saveAudio();
 
-    const questionId = questions[currentQuestionIndex]._id;
-    localStorage.setItem("currentQuestionIndex", currentQuestionIndex.toString());
-    localStorage.setItem("questionID", questionId);
+    const questionId = questions[currentQuestionIndex]._id;;
     const userId = Cookies.get("userId");
     if (!userId) {
       console.error("User ID not found in cookies.");
@@ -362,6 +360,8 @@ export default function Canvas() {
       localStorage.setItem("currentFeedback", JSON.stringify(feedback));
   
       // Navigate to Feedback Page
+      localStorage.setItem("currentQuestionIndex", currentQuestionIndex.toString());
+      localStorage.setItem("questionID", questionId)
       router.push("/feedback");
     }, "image/png");
     

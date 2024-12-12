@@ -61,7 +61,7 @@ export default function FeedbackPage() {
 
         // Also load questions to get AI solution for this question
         const questionID = localStorage.getItem("questionID");
-        const questionResponse = await authenticatedFetch(`https://backend-839795182838.us-central1.run.app/api/v1/questions/${questionID}`);
+        const questionResponse = await authenticatedFetch(`https://backend-839795182838.us-central1.run.app/api/v1/questions/`);
         if (!questionResponse.ok) {
           throw new Error(`HTTP error loading questions: ${questionResponse.status}`);
         }
