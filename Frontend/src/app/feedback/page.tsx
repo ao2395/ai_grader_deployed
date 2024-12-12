@@ -185,7 +185,7 @@ export default function FeedbackPage() {
           setQuestionData(currentQuestion);
 
           const feedbackResponse = await authenticatedFetch(
-            `https://backend-839795182838.us-central1.run.app/api/v1/submit`,
+            `https://backend-839795182838.us-central1.run.app/api/v1/submit/question`,
             {
               method: "POST",
               body: JSON.stringify({
