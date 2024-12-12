@@ -9,7 +9,6 @@ import FeedbackPageSubheader from "@/components/FeedbackPageSubheader";
 import FeedbackContent from "@/components/FeedbackContent";
 import Footer from "@/components/Footer";
 import LearnerHeader from "@/components/LearnerHeader";
-import { authenticatedFetch } from "@/app/utils/api";
 
 interface QuestionData {
   _id: string;
@@ -51,58 +50,38 @@ export default function FeedbackPage() {
     const loadData = async () => {
       try {
         setIsLoading(true);
-
-        // Retrieve userId from cookies
-        const storedUserId = Cookies.get("userId");
-        if (!storedUserId) {
-          throw new Error("No user ID found in cookies");
+        const storedFeedback = localStorage.getItem("currentFeedback");
+        if (!storedFeedback) {
+          throw new Error("No feedback data found in localStorage");
         }
 
-        // Fetch questions data
-        const questionResponse = await authenticatedFetch(
-          "https://backend-839795182838.us-central1.run.app/api/v1/questions"
-        );
+        const feedback: FeedbackData = JSON.parse(storedFeedback);
+        setFeedbackData(feedback);
+
+        // Also load questions to get AI solution for this question
+        const questionResponse = await fetch("https://backend-839795182838.us-central1.run.app/api/v1/questions");
         if (!questionResponse.ok) {
-          throw new Error(`HTTP error! status: ${questionResponse.status}`);
+          throw new Error(`HTTP error loading questions: ${questionResponse.status}`);
         }
 
         const questions: QuestionData[] = await questionResponse.json();
         setTotalQuestions(questions.length);
 
-        // Get current question index from localStorage
         const storedIndex = localStorage.getItem("currentQuestionIndex");
-        if (storedIndex === null) {
-          throw new Error("No question index found in localStorage");
-        }
+        if (storedIndex === null) throw new Error("No question index found in localStorage");
 
-        // Use the currentQuestionIndex directly (no decrement)
         const questionIndex = parseInt(storedIndex, 10);
         if (isNaN(questionIndex) || questionIndex < 0 || questionIndex >= questions.length) {
           throw new Error("Invalid question index");
         }
 
         const currentQuestion = questions[questionIndex];
-
         if (!currentQuestion) {
           throw new Error(`Question with index ${questionIndex} not found`);
         }
 
-        // Now retrieve feedback data from the responses endpoint
-        // Assuming you have an endpoint like:
-        // GET /api/v1/responses?userId=<userId>&questionId=<questionId>
-        const feedbackUrl = `https://backend-839795182838.us-central1.run.app/api/v1/responses?userId=${storedUserId}&questionId=${currentQuestion._id}`;
-        const feedbackResponse = await authenticatedFetch(feedbackUrl);
-
-        if (!feedbackResponse.ok) {
-          const errorText = await feedbackResponse.text();
-          throw new Error(`HTTP error! status: ${feedbackResponse.status}, message: ${errorText}`);
-        }
-
-        const feedbackData: FeedbackData = await feedbackResponse.json();
-
         if (isMounted) {
           setQuestionData(currentQuestion);
-          setFeedbackData(feedbackData);
         }
       } catch (err) {
         console.error("Error loading data:", err);

@@ -19,6 +19,11 @@ interface QuestionData {
   answer: string;
   module: string;
 }
+interface FeedbackData {
+  grade: string;
+  writtenFeedback: string;
+  spokenFeedback: string;
+}
 
 export default function Canvas() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -223,28 +228,14 @@ export default function Canvas() {
     loadQuestions();
   }, []);
 
-  const sendQuestionData = async (questionId: string) => {
-    const userId = Cookies.get("userId"); // Retrieve userId from cookies
-
-    if (!userId) {
-      console.error("User ID not found in cookies.");
-      return;
-    }
-
-    const payload = {
-      questionId: questionId,
-      userId: userId,
-    };
-
+  const sendQuestionData = async (questionId: string, userId: string): Promise<FeedbackData | null> => {
     try {
       const response = await authenticatedFetch(
         "https://backend-839795182838.us-central1.run.app/api/v1/submit/question",
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(payload),
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ questionId, userId }),
         }
       );
 
@@ -254,9 +245,11 @@ export default function Canvas() {
       }
 
       const data = await response.json();
-      console.log("Question data submitted successfully:", data);
+      console.log("Question data (feedback) submitted successfully:", data);
+      return data;
     } catch (error) {
       console.error("Error submitting question data:", error);
+      return null;
     }
   };
   // eslint-disable-next-line no-unused-vars
@@ -281,8 +274,6 @@ export default function Canvas() {
       console.error("User ID not found in cookies.");
       return;
     }
-
-    await sendQuestionData(questionId);
 
     const currentDate = new Date();
     const formattedDate = currentDate.toISOString().split("T")[0];
@@ -361,7 +352,19 @@ export default function Canvas() {
       } else {
         console.error("Failed to retrieve canvas content.");
       }
+      const feedback = await sendQuestionData(questionId,userId);
+      if (!feedback) {
+        console.error("No feedback returned.");
+        return;
+      }
+  
+      // Store feedback in localStorage
+      localStorage.setItem("currentFeedback", JSON.stringify(feedback));
+  
+      // Navigate to Feedback Page
+      router.push("/feedback");
     }, "image/png");
+    
   };
 
   const handleRecordingToggle = () => {
