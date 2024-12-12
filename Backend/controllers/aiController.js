@@ -152,6 +152,11 @@ async function gradeSubmission(imagePath, transcription, question, officialAnswe
 
 // Process Submission
 async function processSubmission(bucketName, questionId, userId) {
+  return {
+    "grade": "A",
+    "writtenFeedback": "The written solution is correct and demonstrates a solid understanding of solving linear equations. The student accurately performed the steps of subtracting 5 from both sides and then dividing by 2. The solution is clearly presented, and there are no errors in the methodology.",
+    "spokenFeedback": "The verbal explanation is clear and concise. The student correctly described the steps taken to solve the equation, showing an understanding of balancing both sides of the equation. However, the explanation could be improved by briefly stating why each step maintains equality (e.g., why subtracting 5 from both sides is valid)."
+  }
   try {
     const filenames = await listFilesInBucket(bucketName);
 

@@ -1,10 +1,10 @@
 const express = require("express");
 const aiController = require("../controllers/aiController");
-// const authMiddleware = require("../middleware/auth");
+const authMiddleware = require("../middleware/auth");
 
 const aiRouter = express.Router();
 
-aiRouter.post("/question", async (req, res) => {
+aiRouter.post("/question", authMiddleware, async (req, res) => {
   try {
     const { questionId, userId } = req.body;
     if (!questionId || !userId) {
