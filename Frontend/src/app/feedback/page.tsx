@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Cookies from "js-cookie"; // Import js-cookie for cookie management
+import Cookies from "js-cookie";
 import { MathJaxContext, MathJax } from "better-react-mathjax";
 import { Button } from "@/components/ui/button";
 import FeedbackPageSubheader from "@/components/FeedbackPageSubheader";
@@ -10,7 +10,6 @@ import FeedbackContent from "@/components/FeedbackContent";
 import Footer from "@/components/Footer";
 import LearnerHeader from "@/components/LearnerHeader";
 import { authenticatedFetch } from "@/app/utils/api";
-import { Lexend_Tera } from "next/font/google";
 
 interface QuestionData {
   _id: string;
@@ -46,104 +45,6 @@ export default function FeedbackPage() {
   const [totalQuestions, setTotalQuestions] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
 
-  const saveResponse = async (feedbackData: FeedbackData, questionId: string, userId: string) => {
-    try {
-      const response = await authenticatedFetch(
-        "https://backend-839795182838.us-central1.run.app/api/v1/responses",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            user_id: userId,
-            question_id: questionId,
-            gpt_written_feedback: feedbackData.writtenFeedback,
-            gpt_spoken_feedback: feedbackData.spokenFeedback,
-            grade: feedbackData.grade,
-          }),
-        }
-      );
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error("Response not OK:", response.status, errorText);
-        throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
-      }
-    } catch (error) {
-      console.error("Failed to save response:", error);
-      setError(
-        `Failed to save response. ${error instanceof Error ? error.message : "Please try again."}`
-      );
-    }
-  };
-
-  // useEffect(() => {
-  //   let isMounted = true;
-
-  //   const loadData = async () => {
-  //     try {
-  //       setIsLoading(true);
-
-  //       // Get userId from cookies
-  //       const storedUserId = Cookies.get("userId");
-  //       if (!storedUserId) {
-  //         throw new Error("No user ID found in cookies");
-  //       }
-
-  //       // Fetch questions data
-  //       const questionResponse = await authenticatedFetch(
-  //         "https://backend-839795182838.us-central1.run.app/api/v1/questions"
-  //       );
-  //       if (!questionResponse.ok) throw new Error(`HTTP error! status: ${questionResponse.status}`);
-
-  //       const questionData = await questionResponse.json();
-  //       setTotalQuestions(questionData.length);
-
-  //       // Get current question index from localStorage
-  //       const storedIndex = localStorage.getItem("currentQuestionIndex");
-  //       if (storedIndex === null) throw new Error("No question index found in localStorage");
-
-  //       const questionIndex = parseInt(storedIndex, 10);
-  //       const currentQuestion = questionData[questionIndex];
-
-  //       if (isMounted && currentQuestion) {
-  //         setQuestionData(currentQuestion);
-
-  //         const feedbackResponse = await authenticatedFetch(
-  //           `https://backend-839795182838.us-central1.run.app/api/v1/submit`,
-  //           {
-  //             method: "POST",
-  //             body: JSON.stringify({
-  //               questionId: currentQuestion._id,
-  //               userId: storedUserId,
-  //             }),
-  //           }
-  //         );
-
-  //         if (feedbackResponse.ok) {
-  //           const feedbackData = await feedbackResponse.json();
-  //           setFeedbackData(feedbackData);
-  //           await saveResponse(feedbackData, currentQuestion._id, storedUserId);
-  //         } else {
-  //           throw new Error(`HTTP error! status: ${feedbackResponse.status}`);
-  //         }
-  //       } else if (isMounted) {
-  //         setError(`Question with index ${questionIndex} not found`);
-  //       }
-  //     } catch (err) {
-  //       console.error("Error loading data:", err);
-  //       setError(`Error loading data. ${err instanceof Error ? err.message : "Please try again."}`);
-  //     } finally {
-  //       if (isMounted) setIsLoading(false);
-  //     }
-  //   };
-
-  //   loadData();
-
-  //   return () => {
-  //     isMounted = false;
-  //   };
-  // }, []);
-
   useEffect(() => {
     let isMounted = true;
 
@@ -151,7 +52,7 @@ export default function FeedbackPage() {
       try {
         setIsLoading(true);
 
-        // Get userId from cookies
+        // Retrieve userId from cookies
         const storedUserId = Cookies.get("userId");
         if (!storedUserId) {
           throw new Error("No user ID found in cookies");
@@ -161,51 +62,47 @@ export default function FeedbackPage() {
         const questionResponse = await authenticatedFetch(
           "https://backend-839795182838.us-central1.run.app/api/v1/questions"
         );
-        if (!questionResponse.ok) throw new Error(`HTTP error! status: ${questionResponse.status}`);
+        if (!questionResponse.ok) {
+          throw new Error(`HTTP error! status: ${questionResponse.status}`);
+        }
 
         const questions: QuestionData[] = await questionResponse.json();
         setTotalQuestions(questions.length);
 
         // Get current question index from localStorage
         const storedIndex = localStorage.getItem("currentQuestionIndex");
-        console.log("Stored Question Index:", storedIndex); // Debugging line
-        if (storedIndex === null) throw new Error("No question index found in localStorage");
+        if (storedIndex === null) {
+          throw new Error("No question index found in localStorage");
+        }
 
-       let questionIndex = parseInt(storedIndex, 10);
-        questionIndex--;
-        console.log("Parsed Question Index:", questionIndex); // Debugging line
-
-        // Validate questionIndex
+        // Use the currentQuestionIndex directly (no decrement)
+        const questionIndex = parseInt(storedIndex, 10);
         if (isNaN(questionIndex) || questionIndex < 0 || questionIndex >= questions.length) {
           throw new Error("Invalid question index");
         }
 
         const currentQuestion = questions[questionIndex];
-        console.log("Current Question:", currentQuestion); // Debugging line
 
-        if (isMounted && currentQuestion) {
+        if (!currentQuestion) {
+          throw new Error(`Question with index ${questionIndex} not found`);
+        }
+
+        // Now retrieve feedback data from the responses endpoint
+        // Assuming you have an endpoint like:
+        // GET /api/v1/responses?userId=<userId>&questionId=<questionId>
+        const feedbackUrl = `https://backend-839795182838.us-central1.run.app/api/v1/responses?userId=${storedUserId}&questionId=${currentQuestion._id}`;
+        const feedbackResponse = await authenticatedFetch(feedbackUrl);
+
+        if (!feedbackResponse.ok) {
+          const errorText = await feedbackResponse.text();
+          throw new Error(`HTTP error! status: ${feedbackResponse.status}, message: ${errorText}`);
+        }
+
+        const feedbackData: FeedbackData = await feedbackResponse.json();
+
+        if (isMounted) {
           setQuestionData(currentQuestion);
-
-          const feedbackResponse = await authenticatedFetch(
-            `https://backend-839795182838.us-central1.run.app/api/v1/submit/question`,
-            {
-              method: "POST",
-              body: JSON.stringify({
-                questionId: currentQuestion._id,
-                userId: storedUserId,
-              }),
-            }
-          );
-
-          if (feedbackResponse.ok) {
-            const feedbackData = await feedbackResponse.json();
-            setFeedbackData(feedbackData);
-            await saveResponse(feedbackData, currentQuestion._id, storedUserId);
-          } else {
-            throw new Error(`HTTP error! status: ${feedbackResponse.status}`);
-          }
-        } else if (isMounted) {
-          setError(`Question with index ${questionIndex} not found`);
+          setFeedbackData(feedbackData);
         }
       } catch (err) {
         console.error("Error loading data:", err);
