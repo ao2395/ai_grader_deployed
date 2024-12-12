@@ -173,75 +173,16 @@ export default function Canvas() {
     }
   }, []);
 
-  const downloadFile = (blob: Blob, filename: string) => {
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = filename;
-    link.click();
-    URL.revokeObjectURL(url);
-  };
 
   const saveAudio = async () => {
     if (audioChunksRef.current.length > 0) {
-      const audioBlob = new Blob(audioChunksRef.current, { type: "audio/wav" });
-
-      const formData1 = new FormData();
-      const formData2 = new FormData();
-
-      const currentDate = new Date();
-      const formattedDate = currentDate.toISOString().split("T")[0];
-      const formattedTime = currentDate.toTimeString().split(" ")[0].replace(/:/g, "");
-      const fileName = `recorded_audio_${formattedDate}_${formattedTime}.wav`;
-
-      // Append the same file to both FormData objects
-      formData1.append("file", audioBlob, fileName);
-      formData2.append("file", audioBlob, fileName);
-
-      try {
-        // Upload to both storages in parallel
-        const [regularUpload, researchUpload] = await Promise.all([
-          authenticatedFetch(
-            "https://backend-839795182838.us-central1.run.app/api/v1/upload/audio",
-            {
-              method: "POST",
-              body: formData1,
-            }
-          ),
-          authenticatedFetch(
-            "https://backend-839795182838.us-central1.run.app/api/v1/upload/research/audio",
-            {
-              method: "POST",
-              body: formData2,
-            }
-          ),
-        ]);
-
-        // Download the file locally
-        downloadFile(audioBlob, "recorded_audio.wav");
-
-        // Parse both responses
-        const [regularData, researchData] = await Promise.all([
-          regularUpload.json(),
-          researchUpload.json(),
-        ]);
-
-        if (regularUpload.ok && researchUpload.ok) {
-          console.log("Regular upload successful:", regularData.publicUrl);
-          console.log("Research upload successful:", researchData.publicUrl);
-        } else {
-          console.error("Failed to upload to one or more locations:", {
-            regular: regularUpload.ok ? "Success" : "Failed",
-            research: researchUpload.ok ? "Success" : "Failed",
-          });
-        }
-      } catch (error) {
-        console.error("Error uploading audio:", error);
-      }
+      return new Blob(audioChunksRef.current, { type: "audio/wav" });
     } else {
       console.log("No audio recorded yet");
+      return null;
     }
   };
+  
   useEffect(() => {
     const loadQuestions = async () => {
       try {
@@ -280,59 +221,78 @@ export default function Canvas() {
   }, []);
 
   const handleSubmit = async () => {
-    await saveAudio()
+    const audioBlob = await saveAudio();
     const canvasElement = document.querySelector("canvas");
-
+  
+    if (audioBlob) {
+      const formData1 = new FormData();
+      const formData2 = new FormData();
+  
+      const currentDate = new Date();
+      const formattedDate = currentDate.toISOString().split("T")[0];
+      const formattedTime = currentDate.toTimeString().split(" ")[0].replace(/:/g, "");
+      const audioFileName = `recorded_audio_${formattedDate}_${formattedTime}.wav`;
+  
+      formData1.append("file", audioBlob, audioFileName);
+      formData2.append("file", audioBlob, audioFileName);
+  
+      try {
+        // Upload audio to both endpoints
+        await Promise.all([
+          authenticatedFetch(
+            "https://backend-839795182838.us-central1.run.app/api/v1/upload/audio",
+            { method: "POST", body: formData1 }
+          ),
+          authenticatedFetch(
+            "https://backend-839795182838.us-central1.run.app/api/v1/upload/research/audio",
+            { method: "POST", body: formData2 }
+          ),
+        ]);
+      } catch (error) {
+        console.error("Error uploading audio:", error);
+        return;
+      }
+    }
+  
     if (canvasElement) {
       canvasElement.toBlob(async (blob) => {
         if (blob) {
           const formData1 = new FormData();
           const formData2 = new FormData();
-
+  
           const currentDate = new Date();
           const formattedDate = currentDate.toISOString().split("T")[0];
           const formattedTime = currentDate.toTimeString().split(" ")[0].replace(/:/g, "");
-          const fileName = `${questions[currentQuestionIndex]._id}_${formattedDate}_${formattedTime}.png`;
-
-          // Append the same file to both FormData objects
-          formData1.append("file", blob, fileName);
-          formData2.append("file", blob, fileName);
-
+          const imageFileName = `${questions[currentQuestionIndex]._id}_${formattedDate}_${formattedTime}.png`;
+  
+          formData1.append("file", blob, imageFileName);
+          formData2.append("file", blob, imageFileName);
+  
           try {
-            // Upload to both storages in parallel
+            // Upload image to both endpoints
             const [regularUpload, researchUpload] = await Promise.all([
               authenticatedFetch(
                 "https://backend-839795182838.us-central1.run.app/api/v1/upload/image",
-                {
-                  method: "POST",
-                  body: formData1,
-                }
+                { method: "POST", body: formData1 }
               ),
               authenticatedFetch(
                 "https://backend-839795182838.us-central1.run.app/api/v1/upload/research/image",
-                {
-                  method: "POST",
-                  body: formData2,
-                }
+                { method: "POST", body: formData2 }
               ),
             ]);
-
-            // Parse both responses
+  
             const [regularData, researchData] = await Promise.all([
               regularUpload.json(),
               researchUpload.json(),
             ]);
-
+  
             if (regularUpload.ok && researchUpload.ok) {
               console.log("Regular upload successful:", regularData.publicUrl);
               console.log("Research upload successful:", researchData.publicUrl);
               localStorage.setItem("currentQuestionIndex", currentQuestionIndex.toString());
               router.push("/feedback");
             } else {
-              console.error("Failed to upload to one or more locations:", {
-                regular: regularUpload.ok ? "Success" : "Failed",
-                research: researchUpload.ok ? "Success" : "Failed",
-              });
+              console.error("Failed to upload to one or more locations");
             }
           } catch (error) {
             console.error("Error uploading image:", error);
@@ -345,6 +305,7 @@ export default function Canvas() {
       console.error("Canvas element not found.");
     }
   };
+  
   // const downloadImage = () => {
   //   if (!canvasRef.current) return;
 
