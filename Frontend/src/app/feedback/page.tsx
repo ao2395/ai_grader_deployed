@@ -10,6 +10,7 @@ import FeedbackContent from "@/components/FeedbackContent";
 import Footer from "@/components/Footer";
 import LearnerHeader from "@/components/LearnerHeader";
 import { authenticatedFetch } from "@/app/utils/api";
+import { Lexend_Tera } from "next/font/google";
 
 interface QuestionData {
   _id: string;
@@ -170,7 +171,8 @@ export default function FeedbackPage() {
         console.log("Stored Question Index:", storedIndex); // Debugging line
         if (storedIndex === null) throw new Error("No question index found in localStorage");
 
-        const questionIndex = parseInt(storedIndex, 10);
+       let questionIndex = parseInt(storedIndex, 10);
+        questionIndex--;
         console.log("Parsed Question Index:", questionIndex); // Debugging line
 
         // Validate questionIndex

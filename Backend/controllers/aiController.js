@@ -160,11 +160,6 @@ async function processSubmission(bucketName, questionId, userId) {
       filename.startsWith(`${questionId}_${userId}_`)
     );
 
-    if (filteredFilenames.length !== 2) {
-      throw new Error(
-        `Expected 2 files (1 audio, 1 image) for questionId: ${questionId}, userId: ${userId}, found ${filteredFilenames.length}`
-      );
-    }
 
     let imageFilename = null;
     let audioFilename = null;
