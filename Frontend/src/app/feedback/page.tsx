@@ -9,6 +9,7 @@ import FeedbackPageSubheader from "@/components/FeedbackPageSubheader";
 import FeedbackContent from "@/components/FeedbackContent";
 import Footer from "@/components/Footer";
 import LearnerHeader from "@/components/LearnerHeader";
+import { authenticatedFetch } from "../utils/api";
 
 interface QuestionData {
   _id: string;
@@ -59,7 +60,7 @@ export default function FeedbackPage() {
         setFeedbackData(feedback);
 
         // Also load questions to get AI solution for this question
-        const questionResponse = await fetch("https://backend-839795182838.us-central1.run.app/api/v1/questions");
+        const questionResponse = await authenticatedFetch("https://backend-839795182838.us-central1.run.app/api/v1/questions");
         if (!questionResponse.ok) {
           throw new Error(`HTTP error loading questions: ${questionResponse.status}`);
         }
