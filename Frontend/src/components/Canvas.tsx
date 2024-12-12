@@ -269,6 +269,7 @@ export default function Canvas() {
     const audioBlob = await saveAudio();
 
     const questionId = questions[currentQuestionIndex]._id;
+    localStorage.setItem("questionID", questionId);
     const userId = Cookies.get("userId");
     if (!userId) {
       console.error("User ID not found in cookies.");
