@@ -17,7 +17,7 @@ const submitRouter = require("./routes/aiRoutes");
 const gcsRouter = require("./routes/gcsRoutes");
 
 const app = express();
-
+app.set("trust proxy", true);
 // Middlewares
 app.use(helmet());
 
