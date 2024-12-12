@@ -7,11 +7,10 @@ import PracticePageSubheader from "@/components/PracticePageSubheader";
 import ModeToggle from "@/components/ModeToggle";
 import Canvas from "@/components/Canvas";
 import Footer from "@/components/Footer";
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import SubmitButton from "@/components/ui/submit-button";
 import QuestionNavigation from "@/components/QuestionNavigation";
 import LearnerHeader from "@/components/LearnerHeader";
 import { authenticatedFetch } from "@/app/utils/api";
+import Cookies from "js-cookie";
 
 interface QuestionData {
   _id: string;
@@ -35,6 +34,7 @@ export default function PracticePage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+  const userId = Cookies.get("userId") || "";
 
   useEffect(() => {
     const loadQuestions = async () => {
@@ -46,9 +46,8 @@ export default function PracticePage() {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-        const data = await response.json();
+        const data: QuestionData[] = await response.json();
         setQuestions(data);
-        //setTotalQuestions(data.length);
 
         const storedIndex = localStorage.getItem("currentQuestionIndex");
         if (storedIndex !== null) {
@@ -72,74 +71,6 @@ export default function PracticePage() {
     };
     loadQuestions();
   }, []);
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const handleSubmit = async () => {
-    const canvasElement = document.querySelector("canvas");
-
-    if (canvasElement) {
-      canvasElement.toBlob(async (blob) => {
-        if (blob) {
-          const formData1 = new FormData();
-          const formData2 = new FormData();
-
-          const currentDate = new Date();
-          const formattedDate = currentDate.toISOString().split("T")[0];
-          const formattedTime = currentDate.toTimeString().split(" ")[0].replace(/:/g, "");
-          const fileName = `${questions[currentQuestionIndex]._id}_${formattedDate}_${formattedTime}.png`;
-          localStorage.setItem("questionID", questions[currentQuestionIndex]._id);
-
-          // Append the same file to both FormData objects
-          formData1.append("file", blob, fileName);
-          formData2.append("file", blob, fileName);
-
-          try {
-            // Upload to both storages in parallel
-            const [regularUpload, researchUpload] = await Promise.all([
-              authenticatedFetch(
-                "https://backend-839795182838.us-central1.run.app/api/v1/upload/image",
-                {
-                  method: "POST",
-                  body: formData1,
-                }
-              ),
-              authenticatedFetch(
-                "https://backend-839795182838.us-central1.run.app/api/v1/upload/research/image",
-                {
-                  method: "POST",
-                  body: formData2,
-                }
-              ),
-            ]);
-
-            // Parse both responses
-            const [regularData, researchData] = await Promise.all([
-              regularUpload.json(),
-              researchUpload.json(),
-            ]);
-
-            if (regularUpload.ok && researchUpload.ok) {
-              console.log("Regular upload successful:", regularData.publicUrl);
-              console.log("Research upload successful:", researchData.publicUrl);
-              localStorage.setItem("currentQuestionIndex", currentQuestionIndex.toString());
-              router.push("/feedback");
-            } else {
-              console.error("Failed to upload to one or more locations:", {
-                regular: regularUpload.ok ? "Success" : "Failed",
-                research: researchUpload.ok ? "Success" : "Failed",
-              });
-            }
-          } catch (error) {
-            console.error("Error uploading image:", error);
-          }
-        } else {
-          console.error("Failed to retrieve canvas content.");
-        }
-      }, "image/png");
-    } else {
-      console.error("Canvas element not found.");
-    }
-  };
 
   const handleNextQuestion = () => {
     setCurrentQuestionIndex((prevIndex) => {
@@ -169,6 +100,8 @@ export default function PracticePage() {
     );
   }
 
+  const currentQuestion = questions[currentQuestionIndex];
+
   return (
     <MathJaxContext>
       <div className='min-h-screen bg-gray-100 flex flex-col'>
@@ -178,17 +111,22 @@ export default function PracticePage() {
             <PracticePageSubheader />
             <div className='p-6'>
               <ModeToggle mode={mode} setMode={setMode} />
-              {questions.length > 0 && (
+              {currentQuestion && (
                 <LatexQuestion
                   key={currentQuestionIndex} // Force re-render of LatexQuestion
-                  question={questions[currentQuestionIndex].question}
+                  question={currentQuestion.question}
                 />
               )}
               <QuestionNavigation
                 onPreviousQuestion={handlePreviousQuestion}
                 onNextQuestion={handleNextQuestion}
               />
-              <Canvas />
+              {currentQuestion && userId && (
+                <Canvas
+                  currentQuestion={currentQuestion}
+                  userId={userId}
+                />
+              )}
             </div>
             <br />
           </div>

@@ -7,7 +7,6 @@ import p5Types from "p5";
 import { authenticatedFetch } from "@/app/utils/api";
 import SubmitButton from "@/components/ui/submit-button";
 import { useRouter } from "next/navigation";
-import Cookies from "js-cookie";
 
 const Sketch = dynamic(() => import("react-p5").then((mod) => mod.default), {
   ssr: false,
@@ -19,13 +18,19 @@ interface QuestionData {
   answer: string;
   module: string;
 }
+
 interface FeedbackData {
   grade: string;
   writtenFeedback: string;
   spokenFeedback: string;
 }
 
-export default function Canvas() {
+interface CanvasProps {
+  currentQuestion: QuestionData;
+  userId: string;
+}
+
+export default function Canvas({ currentQuestion, userId }: CanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [currentSection, setCurrentSection] = useState(0);
@@ -36,12 +41,6 @@ export default function Canvas() {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const router = useRouter();
-  const [questions, setQuestions] = useState<QuestionData[]>([]);
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  // eslint-disable-next-line no-unused-vars
-  const [isLoading, setIsLoading] = useState(true);
-  // eslint-disable-next-line no-unused-vars
-  const [error, setError] = useState<string | null>(null);
 
   const preventScroll = useCallback(
     (e: TouchEvent) => {
@@ -192,42 +191,6 @@ export default function Canvas() {
     }
   };
 
-  useEffect(() => {
-    const loadQuestions = async () => {
-      try {
-        setIsLoading(true);
-        const response = await authenticatedFetch(
-          "https://backend-839795182838.us-central1.run.app/api/v1/questions"
-        );
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
-        setQuestions(data);
-
-        const storedIndex = localStorage.getItem("currentQuestionIndex");
-        if (storedIndex !== null) {
-          const parsedIndex = parseInt(storedIndex, 10);
-          if (!isNaN(parsedIndex) && parsedIndex >= 0 && parsedIndex < data.length) {
-            setCurrentQuestionIndex(parsedIndex);
-          } else {
-            setCurrentQuestionIndex(0);
-            localStorage.setItem("currentQuestionIndex", "0");
-          }
-        } else {
-          setCurrentQuestionIndex(0);
-          localStorage.setItem("currentQuestionIndex", "0");
-        }
-      } catch (error) {
-        console.error("Error loading questions:", error);
-        setError("Failed to load questions. Please try again later.");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    loadQuestions();
-  }, []);
-
   const sendQuestionData = async (questionId: string, userId: string): Promise<FeedbackData | null> => {
     try {
       const response = await authenticatedFetch(
@@ -252,31 +215,12 @@ export default function Canvas() {
       return null;
     }
   };
-  // eslint-disable-next-line no-unused-vars
-  const getCanvasBlob = (): Promise<Blob | null> => {
-    return new Promise((resolve) => {
-      if (canvasRef.current) {
-        canvasRef.current.toBlob((blob) => {
-          resolve(blob);
-        }, "image/png");
-      } else {
-        resolve(null);
-      }
-    });
-  };
 
   const handleSubmit = async () => {
     const audioBlob = await saveAudio();
 
-    const questionId = questions[currentQuestionIndex]._id;
-    localStorage.setItem("currentQuestionIndex", currentQuestionIndex.toString());
-    localStorage.setItem("questionID", questionId);
-    const userId = Cookies.get("userId");
-    if (!userId) {
-      console.error("User ID not found in cookies.");
-      return;
-    }
-
+    const questionId = currentQuestion._id;
+    // We now rely on parent for index; no need to set localStorage here
     const currentDate = new Date();
     const formattedDate = currentDate.toISOString().split("T")[0];
     const formattedTime = currentDate.toTimeString().split(" ")[0].replace(/:/g, "");
@@ -352,19 +296,19 @@ export default function Canvas() {
       } else {
         console.error("Failed to retrieve canvas content.");
       }
-      const feedback = await sendQuestionData(questionId,userId);
+
+      const feedback = await sendQuestionData(questionId, userId);
       if (!feedback) {
         console.error("No feedback returned.");
         return;
       }
-  
+
       // Store feedback in localStorage
       localStorage.setItem("currentFeedback", JSON.stringify(feedback));
-  
+
       // Navigate to Feedback Page
       router.push("/feedback");
     }, "image/png");
-    
   };
 
   const handleRecordingToggle = () => {
