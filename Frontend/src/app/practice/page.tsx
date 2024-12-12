@@ -87,6 +87,7 @@ export default function PracticePage() {
           const formattedDate = currentDate.toISOString().split("T")[0];
           const formattedTime = currentDate.toTimeString().split(" ")[0].replace(/:/g, "");
           const fileName = `${questions[currentQuestionIndex]._id}_${formattedDate}_${formattedTime}.png`;
+          localStorage.setItem("questionID", questions[currentQuestionIndex]._id);
 
           // Append the same file to both FormData objects
           formData1.append("file", blob, fileName);

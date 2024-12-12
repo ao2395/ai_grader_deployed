@@ -60,7 +60,8 @@ export default function FeedbackPage() {
         setFeedbackData(feedback);
 
         // Also load questions to get AI solution for this question
-        const questionResponse = await authenticatedFetch("https://backend-839795182838.us-central1.run.app/api/v1/questions");
+        const questionID = localStorage.getItem("questionID");
+        const questionResponse = await authenticatedFetch(`https://backend-839795182838.us-central1.run.app/api/v1/questions/${questionID}`);
         if (!questionResponse.ok) {
           throw new Error(`HTTP error loading questions: ${questionResponse.status}`);
         }
