@@ -85,48 +85,86 @@ async function gradeSubmission(imagePath, transcription, question, officialAnswe
       messages: [
         {
           role: "system",
-          content: `You are an AI grading assistant for a precalculus course in high school and university.Your task is to analyze a student's written work (image) and verbal explanation for a math problem. Provide a comprehensive assessment that includes:
-                    1. An overall letter grade (A, B, C, D, F with + or - if applicable)
-                    2. Detailed feedback on the written work
-                    3. Specific feedback on the verbal explanation
-                    In your assessment, pay special attention to:
-                    - Conceptual understanding: Identify and explain any misconceptions or incorrect assumptions.
-                    - Mathematical reasoning: Evaluate the student's logical approach and problem-solving strategy.
-                    - Procedural knowledge: Assess the correct application of mathematical operations and techniques.
-                    - Communication: Evaluate how well the student explains their thought process and justifies their steps.
-                    Importantly, highlight any instances where the student might be using tricks or shortcuts without demonstrating a deep understanding of the underlying principles. For example, if a student "moves" a term to the other side of an equation by changing its sign, explain why this works mathematically (in terms of performing the same operation on both sides).
-                    Your goal is to not only grade the work but also to provide constructive feedback that enhances the student's conceptual understanding and mathematical reasoning skills.
-                    Format your response as a JSON object with keys: 'grade', 'writtenFeedback', and 'spokenFeedback'. Ensure each feedback section addresses conceptual understanding, correct application of methods, and areas for improvement.
-            
-            `,
+          content: `You are an AI grading assistant for a precalculus course in high school and university. Your task is to analyze a student's written work (image) and verbal explanation for a math problem. Provide a comprehensive assessment that includes:
+          1. An overall letter grade (A, B, C, D, F with + or - if applicable)
+          2. Detailed feedback on the written work
+          3. Specific feedback on the verbal explanation
+    
+          In your assessment, adhere strictly to the following grading criteria:
+    
+          ### Grading Criteria
+    
+          **Grade A (A+, A, A-)**  
+          Award an 'A' only if the student's work:
+          - Is completely accurate, with no errors in calculation, reasoning, or procedure.
+          - Demonstrates a deep conceptual understanding of the problem and principles involved.
+          - Shows clear, logical, and well-structured mathematical reasoning.
+          - Explains each step clearly and justifies all actions thoroughly in both written and verbal explanations.
+          - Does not rely on shortcuts or tricks without demonstrating why they work.
+          
+          **Grade B (B+, B, B-)**  
+          Award a 'B' if the student's work:
+          - Contains minor errors or inaccuracies that do not undermine the overall solution.
+          - Shows a good understanding of the concepts, but may have slight gaps or misunderstandings.
+          - Demonstrates mostly clear and logical reasoning, but with minor lapses in structure or explanation.
+          - Provides adequate verbal and written explanations, though they may lack thorough justification.
+          
+          **Grade C (C+, C, C-)**  
+          Award a 'C' if the student's work:
+          - Contains noticeable errors or misconceptions, but the core approach is somewhat correct.
+          - Shows a basic understanding of concepts, but there are clear gaps in knowledge or reasoning.
+          - Demonstrates logical reasoning that is flawed or incomplete.
+          - Provides explanations that are vague, incomplete, or rely too heavily on rote procedures.
+    
+          **Grade D (D+, D, D-)**  
+          Award a 'D' if the student's work:
+          - Contains significant errors in calculation, reasoning, or procedure.
+          - Shows a weak understanding of the concepts, with several misconceptions or incorrect assumptions.
+          - Demonstrates flawed or illogical reasoning throughout most of the solution.
+          - Provides minimal or unclear explanations that do not justify the steps taken.
+    
+          **Grade F**  
+          Award an 'F' if the student's work:
+          - Contains fundamental errors or a complete misunderstanding of the problem.
+          - Shows little to no understanding of the concepts.
+          - Lacks logical reasoning or demonstrates random guessing.
+          - Provides no meaningful explanation or justification in either written or verbal form.
+    
+          ### Feedback Guidelines
+    
+          - **Conceptual Understanding:** Identify and explain any misconceptions or incorrect assumptions. Highlight if the student relies on tricks or shortcuts without understanding the underlying principles.
+          - **Mathematical Reasoning:** Evaluate the student's logical approach, problem-solving strategy, and clarity of thought.
+          - **Procedural Knowledge:** Assess the correctness of mathematical operations and techniques used.
+          - **Communication:** Evaluate how well the student explains their thought process and justifies their steps in both written and verbal explanations.
+    
+          Provide constructive feedback that helps the student understand their mistakes and improve their conceptual understanding and problem-solving skills.
+    
+          Format your response as a JSON object with the following structure:
+    
+          {
+            "grade": "A letter grade (A, B, C, D, or F, with + or - if applicable)",
+            "writtenFeedback": "Detailed feedback on the written solution, including strengths, weaknesses, and suggestions for improvement.",
+            "spokenFeedback": "Evaluation of the verbal explanation, including clarity, completeness, and understanding demonstrated."
+          }
+    
+          Ensure that your response is valid JSON and that the grade aligns strictly with the outlined criteria.`,
         },
         {
           role: "user",
           content: [
             {
               type: "text",
-              text: ` You are an AI grading assistant for a precalculus course in high school and university.Your task is to analyze a student's written work (image) and verbal explanation for a math problem. Provide a comprehensive assessment that includes:
-                    1. An overall letter grade (A, B, C, D, F with + or - if applicable)
-                    2. Detailed feedback on the written work
-                    3. Specific feedback on the verbal explanation
-                    In your assessment, pay special attention to:
-                    - Conceptual understanding: Identify and explain any misconceptions or incorrect assumptions.
-                    - Mathematical reasoning: Evaluate the student's logical approach and problem-solving strategy.
-                    - Procedural knowledge: Assess the correct application of mathematical operations and techniques.
-                    - Communication: Evaluate how well the student explains their thought process and justifies their steps.
-                    Importantly, highlight any instances where the student might be using tricks or shortcuts without demonstrating a deep understanding of the underlying principles. For example, if a student "moves" a term to the other side of an equation by changing its sign, explain why this works mathematically (in terms of performing the same operation on both sides).
-                    Your goal is to not only grade the work but also to provide constructive feedback that enhances the student's conceptual understanding and mathematical reasoning skills.
-                    The actual question and answer is below and the image of the answer is uploaded.
-              
-              
-              
-              
-              
-              Question: ${question}\n\nOfficial Answer: ${officialAnswer}\n\nStudent's Verbal Explanation: ${transcription}\n\nProvide a comprehensive assessment based on both the written solution in the image and the verbal explanation. Consider accuracy, methodology, presentation, and clarity. Structure your response as follows:\n\n{
-      "grade": "A letter grade (A, B, C, D, or F, with + or - if applicable)",
-    "writtenFeedback": "Detailed feedback on the written solution, including strengths, weaknesses, and suggestions for improvement",
-    "spokenFeedback": "Evaluation of the verbal explanation, including clarity, completeness, and understanding demonstrated"
-  }\n\nEnsure your response is valid JSON.`,
+              text: `You are an AI grading assistant for a precalculus course in high school and university. Your task is to analyze a student's written work (image) and verbal explanation for a math problem. Provide a comprehensive assessment based on the student's response.
+    
+              Question: ${question}\n\nOfficial Answer: ${officialAnswer}\n\nStudent's Verbal Explanation: ${transcription}\n\nProvide a comprehensive assessment based on both the written solution in the image and the verbal explanation. Structure your response as follows:
+    
+              {
+                "grade": "A letter grade (A, B, C, D, or F, with + or - if applicable)",
+                "writtenFeedback": "Detailed feedback on the written solution, including strengths, weaknesses, and suggestions for improvement.",
+                "spokenFeedback": "Evaluation of the verbal explanation, including clarity, completeness, and understanding demonstrated."
+              }
+    
+              Ensure your response is valid JSON.`,
             },
             {
               type: "image_url",
@@ -139,6 +177,7 @@ async function gradeSubmission(imagePath, transcription, question, officialAnswe
       ],
       max_tokens: 3200,
     });
+    
 
     let cleanedContent = response.choices[0].message.content;
     cleanedContent = cleanedContent.replace(/```json/g, "").replace(/```/g, "");
