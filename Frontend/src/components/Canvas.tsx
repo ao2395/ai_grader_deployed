@@ -192,41 +192,6 @@ export default function Canvas() {
     }
   };
 
-  useEffect(() => {
-    const loadQuestions = async () => {
-      try {
-        setIsLoading(true);
-        const response = await authenticatedFetch(
-          "https://backend-839795182838.us-central1.run.app/api/v1/questions"
-        );
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
-        setQuestions(data);
-
-        const storedIndex = localStorage.getItem("currentQuestionIndex");
-        if (storedIndex !== null) {
-          const parsedIndex = parseInt(storedIndex, 10);
-          if (!isNaN(parsedIndex) && parsedIndex >= 0 && parsedIndex < data.length) {
-            setCurrentQuestionIndex(parsedIndex);
-          } else {
-            setCurrentQuestionIndex(0);
-            localStorage.setItem("currentQuestionIndex", "0");
-          }
-        } else {
-          setCurrentQuestionIndex(0);
-          localStorage.setItem("currentQuestionIndex", "0");
-        }
-      } catch (error) {
-        console.error("Error loading questions:", error);
-        setError("Failed to load questions. Please try again later.");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    loadQuestions();
-  }, []);
 
   const sendQuestionData = async (questionId: string, userId: string): Promise<FeedbackData | null> => {
     try {
