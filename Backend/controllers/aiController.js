@@ -267,6 +267,7 @@ async function processSubmission(bucketName, questionId, userId) {
     console.log("Grading Feedback:", JSON.stringify(feedback, null, 2));
 
     // Clean up files if desired
+    
     await deleteAllFilesfromRoot();
 
     return feedback
