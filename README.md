@@ -72,6 +72,34 @@ Our application uses the following main data models:
 4. Start the development server:
    npm run dev
 
+
 ## 🖥️ How to Use AI Grader
 
 1. 📝 Sign up for an account on [drawexplain.com](https://drawexplain.com)
+2. 🏋️‍♀️ Navigate to the Practice page
+3. 📱 Ensure you have an iPad or equivalent device for on-screen writing
+4. 🎙️ Click the "Start Recording" button
+5. ✍️ Begin explaining your solution verbally while writing on the canvas
+6. 🛑 When finished, click "Stop Recording"
+7. 📤 Click the "Submit" button to send your solution for grading
+8. ⏳ Wait a few seconds for the AI to process your submission
+9. 📊 Review your personalized feedback and improve your skills!
+
+## 🤝 Contributing
+
+We welcome contributions to AI Grader! Please see our [CONTRIBUTING.md](CONTRIBUTING.md) file for details on how to get involved.
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
+
+## 🙏 Acknowledgements
+
+- Thanks to all the educators and students who provided valuable feedback during our development process.
+- Shoutout to the amazing open-source community for the tools and libraries that made this project possible.
+
+## 📞 Contact
+
+For any questions or support, please email us at support@drawexplain.com or open an issue in this repository.
+
+Happy learning! 🚀📚
