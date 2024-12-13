@@ -25,7 +25,7 @@ const AuthCallback = () => {
         try {
           // Decode the token to extract user information
           const decoded: DecodedToken = jwtDecode<DecodedToken>(token);
-          console.log(decoded)
+          //console.log(decoded)
 
           // Ensure that the token contains the necessary user information
           if (decoded && decoded.user && decoded.user.id) {
