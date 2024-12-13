@@ -266,8 +266,25 @@ async function processSubmission(bucketName, questionId, userId) {
 
     console.log("Grading Feedback:", JSON.stringify(feedback, null, 2));
 
-    // Clean up files if desired
-    
+    const req = {
+      body: {
+        user_id: userId,
+        question_id: questionId,
+        gpt_written_feedback: feedback.writtenFeedback,
+        gpt_spoken_feedback: feedback.spokenFeedback,
+        grade: feedback.grade,
+      },
+    };
+
+    const res = {
+      status: (statusCode) => ({
+        json: (data) => {
+          console.log(`Response saved with status ${statusCode}:`, data);
+        },
+      }),
+    };
+
+    await responseController.createResponse(req, res);
     await deleteAllFilesfromRoot();
 
     return feedback
