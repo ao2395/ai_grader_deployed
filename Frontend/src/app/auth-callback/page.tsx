@@ -10,9 +10,7 @@ import { jwtDecode } from "jwt-decode";
 interface DecodedToken {
   user: {
     id: string;
-    // Add other user properties if needed
   };
-  // Add other token properties if needed
 }
 
 const AuthCallback = () => {
@@ -27,6 +25,7 @@ const AuthCallback = () => {
         try {
           // Decode the token to extract user information
           const decoded: DecodedToken = jwtDecode<DecodedToken>(token);
+          console.log(decoded)
 
           // Ensure that the token contains the necessary user information
           if (decoded && decoded.user && decoded.user.id) {
