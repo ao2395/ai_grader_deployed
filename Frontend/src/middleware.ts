@@ -15,14 +15,14 @@ export function middleware(request: NextRequest) {
 
   // If the path is not public and there's no token, redirect to login
   if (!isPublicPath && !token) {
-    return NextResponse.redirect(new URL("/signup", request.url)); // Redirect to /login
+    return NextResponse.redirect(new URL("/login", request.url)); // Redirect to login
   }
 
-  // If the user has a token and tries to access login, signup, or auth-callback, redirect to learner-home
+  // If the user has a token and tries to access login, signup, or auth-callback, redirect to practice
   if (isPublicPath && token) {
     // Exclude /auth-callback from redirection to prevent infinite loops
     if (path !== "/auth-callback") {
-      return NextResponse.redirect(new URL("/learner-home", request.url));
+      return NextResponse.redirect(new URL("/practice", request.url));
     }
   }
 
@@ -36,11 +36,8 @@ export const config = {
     "/",
     "/login",
     "/signup",
-    "/auth-callback", // Added /auth-callback to ensure it's public
-    "/learner-home",
+    "/auth-callback",
     "/practice",
-    "/dashboard",
-    "/feedback",
     "/((?!api|_next/static|_next/image|favicon.ico).*)",
   ],
 };

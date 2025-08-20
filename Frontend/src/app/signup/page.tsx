@@ -36,17 +36,28 @@ export default function SignupPage() {
         }
       );
 
+      // Check if response is ok before trying to parse JSON
+      if (!response.ok) {
+        const contentType = response.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
+          const errorData = await response.json();
+          setError(errorData.message || "Signup failed");
+        } else {
+          const errorText = await response.text();
+          setError(`Signup failed: ${response.status} ${response.statusText}`);
+        }
+        return;
+      }
+
+      // Parse response data
       const data = await response.json();
 
-      if (response.ok) {
-        // Set the token in cookies with a 7-day expiration
-        Cookies.set("token", data.token, { expires: 7, secure: true, sameSite: "lax" });
-        Cookies.set("userId", data.user.id, { expires: 7, secure: true, sameSite: "lax" });
-
-        router.push("/learner-home");
-      } else {
-        setError(data.message || "Signup failed");
-      }
+      // Set the token in cookies with a 7-day expiration
+      Cookies.set("token", data.token, { expires: 7, secure: process.env.NODE_ENV === 'production', sameSite: "lax" });
+      Cookies.set("userId", data.user.id, { expires: 7, secure: process.env.NODE_ENV === 'production', sameSite: "lax" });
+      
+      // Redirect to practice page
+      router.push("/practice");
     } catch (error) {
       console.error("Signup error:", error);
       setError("An error occurred during signup");
