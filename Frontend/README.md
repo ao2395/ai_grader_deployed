@@ -6,7 +6,7 @@ AI Grader is an innovative web application designed to assist students in practi
 
 ## 🖼️ Wireframe
 
-Our low-fidelity wireframe for this project can be viewed here: [Figma Wireframe Link](https://www.figma.com/design/etNkQhgrGFQjpt25ygbWVA/AI-Grader-PPDS?node-id=0-1\&t=G66ZvsqClFRqhnGK-1)
+Our low-fidelity wireframe for this project can be viewed here: [Figma Wireframe Link](https://www.figma.com/design/etNkQhgrGFQjpt25ygbWVA/AI-Grader-PPDS?node-id=0-1&t=G66ZvsqClFRqhnGK-1)
 
 ## 🧩 Component Architecture
 
@@ -21,7 +21,7 @@ Our application is built using React and Next.js, with the following major compo
 7. **QuestionNavigation**: Allows users to navigate between questions, with options to skip or flag questions for later review.
 8. **SubmitButton**: Handles question submission, with error checking and confirmation prompts to prevent accidental submissions.
 9. **ModeToggle**: Toggles between practice and exam modes, adjusting the user interface and functionality accordingly.
-10. **AudioRecorder**: *(In Development)* Will allow users to record verbal explanations of their problem-solving process, enhancing the assessment capabilities of the AI grader.
+10. **AudioRecorder**: _(In Development)_ Will allow users to record verbal explanations of their problem-solving process, enhancing the assessment capabilities of the AI grader.
 
 Each component is implemented in a separate file, promoting a clear separation of concerns and maintainable code structure. This modular approach allows for easy updates and scalability as the project evolves.
 
@@ -46,15 +46,15 @@ Each row in the CSV represents a single question and includes:
 
 ### Sample of Mock Data Structure
 
-| index | question                  | answer | solution        | ai_solution      | written\_feedback | spoken\_feedback | grade |
-| ----- | ------------------------- | ------ | --------------- | ---------------- | ----------------- | ---------------- | ----- |
-| 1     | Simplify the expression:  | $$a^2$$ | Step-by-step... | Let's solve...   | Your answer...    | Great job...     | A     |
-| 2     | Solve the equation:       | $$y = -\frac{1}{3}x + 2$$ | Step-by-step... | Let's solve... | Excellent work!   | You've done...   | B+    |
+| index | question                                  | answer                                                 | solution        | ai_solution    | written_feedback                      | spoken_feedback                    | grade |
+| ----- | ----------------------------------------- | ------------------------------------------------------ | --------------- | -------------- | ------------------------------------- | ---------------------------------- | ----- |
+| 1     | Simplify the expression:                  | $$a^2$$                                                | Step-by-step... | Let's solve... | Your answer...                        | Great job...                       | A     |
+| 2     | Solve the equation:                       | $$y = -\frac{1}{3}x + 2$$                              | Step-by-step... | Let's solve... | Excellent work!                       | You've done...                     | B+    |
 | 3     | Find the center and radius of the circle: | Center: $$(4, -\frac{1}{2})$$, Radius: $$\frac{7}{2}$$ | Step-by-step... | Let's solve... | Your solution correctly identifies... | Your explanation was systematic... | A     |
 
 In the full implementation, the feedback and grade columns would be dynamically filled out by the AI based on the user's input, providing personalized and accurate assessments.
 
-## 🎤 Microphone Feature *(In Development)*
+## 🎤 Microphone Feature _(In Development)_
 
 We are actively working on implementing a microphone feature that will allow students to verbally explain their problem-solving process. This feature will:
 
@@ -112,7 +112,6 @@ This feature is designed to enhance the AI's grading capabilities and provide a 
 5. **localStorage**: Employed for maintaining state between page navigations, simulating session persistence without the need for a backend. This allows for a seamless user experience in the prototype phase.
 6. **react-latex-next**: Integrated for rendering LaTeX equations, ensuring accurate display of mathematical notations crucial for precalculus problems.
 7. **Next.js API Routes**: Utilized to simulate backend endpoints, allowing for a more realistic frontend-backend interaction model in the prototype phase.
-
 
 ## 🤖 AI Usage Documentation
 

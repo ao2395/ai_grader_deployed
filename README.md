@@ -20,6 +20,7 @@ DrawExplain is an innovative educational platform designed to transform the way 
 Our application uses the following main data models:
 
 ### User
+
 - `_id`: Unique identifier
 - `username`: User's chosen username
 - `email`: User's email address
@@ -28,6 +29,7 @@ Our application uses the following main data models:
 - `updatedAt`: Timestamp of last account update
 
 ### Question
+
 - `_id`: Unique identifier
 - `index`: Question number/index
 - `question`: The LaTeX formatted question text
@@ -36,6 +38,7 @@ Our application uses the following main data models:
 - `ai_solution`: AI-generated solution for comparison
 
 ### Submission
+
 - `_id`: Unique identifier
 - `userId`: Reference to the User model
 - `questionId`: Reference to the Question model
@@ -71,7 +74,6 @@ Our application uses the following main data models:
 
 4. Start the development server:
    npm run dev
-
 
 ## 🖥️ How to Use DrawExplain
 

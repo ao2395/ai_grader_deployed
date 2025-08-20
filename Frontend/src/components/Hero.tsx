@@ -32,8 +32,6 @@ export default function Hero() {
                 <iframe 
                   src="https://www.loom.com/embed/eaa97be657c649f0be08b3e26b39f6f5?sid=2d47f61d-dbb6-436f-973a-0e33f3953bf9" 
                   frameBorder="0" 
-                  webkitallowfullscreen="true" 
-                  mozallowfullscreen="true" 
                   allowFullScreen 
                   style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%" }}
                 />
