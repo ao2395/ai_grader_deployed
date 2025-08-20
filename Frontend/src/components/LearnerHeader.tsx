@@ -20,8 +20,10 @@ export default function LearnerHeader() {
   return (
     <header className='bg-white shadow-md'>
       <div className='container mx-auto px-4 py-6 flex justify-between items-center'>
-        <div className='flex items-center'>
-          <div className='w-10 h-10 bg-blue-500 rounded-full mr-3'></div>
+        <div className="flex items-center space-x-3">
+          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center shadow-lg">
+            <span className="text-white font-bold text-lg">D</span>
+          </div>
           <span className='text-xl font-bold text-gray-800'>DrawExplain</span>
         </div>
         <nav>

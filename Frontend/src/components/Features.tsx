@@ -32,19 +32,23 @@ export default function Features() {
     ]
   
     return (
-      <section id="features" className="py-20">
+      <section id="features" className="py-24 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12">Why Choose DrawExplain?</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {features.map((feature, index) => (
-              <div key={index} className="text-center">
-                <div className="bg-gray-100 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
-                  {feature.icon}
+          <h2 className="text-4xl font-bold text-center mb-16 text-gray-800" data-aos="fade-up" data-aos-duration="800">Why Choose DrawExplain?</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+                          {features.map((feature, index) => (
+                <div key={index} className="text-center group" data-aos="fade-up" data-aos-duration="800" data-aos-delay={index * 200}>
+                  <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100">
+                                                              <div className="flex items-center justify-center mx-auto mb-6">
+                       <div className="text-blue-500">
+                         {feature.icon}
+                       </div>
+                     </div>
+                    <h3 className="text-2xl font-bold mb-4 text-gray-800">{feature.title}</h3>
+                    <p className="text-gray-600 text-lg leading-relaxed">{feature.description}</p>
+                  </div>
                 </div>
-                <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
-                <p className="text-gray-600">{feature.description}</p>
-              </div>
-            ))}
+              ))}
           </div>
         </div>
       </section>
