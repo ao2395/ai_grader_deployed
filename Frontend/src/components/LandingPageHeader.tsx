@@ -9,7 +9,7 @@ export default function LandingPageSubheader() {
         {/* Logo and Brand Name */}
         <div className="flex items-center">
           <div className="w-10 h-10 bg-blue-500 rounded-full mr-3"></div>
-          <span className="text-xl font-bold text-gray-800">AI Grader</span>
+          <span className="text-xl font-bold text-gray-800">DrawExplain</span>
         </div>
         {/* Navigation Menu */}
         <nav>

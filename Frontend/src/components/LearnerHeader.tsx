@@ -22,7 +22,7 @@ export default function LearnerHeader() {
       <div className='container mx-auto px-4 py-6 flex justify-between items-center'>
         <div className='flex items-center'>
           <div className='w-10 h-10 bg-blue-500 rounded-full mr-3'></div>
-          <span className='text-xl font-bold text-gray-800'>AI Grader</span>
+          <span className='text-xl font-bold text-gray-800'>DrawExplain</span>
         </div>
         <nav>
           <ul className='flex space-x-6 items-center'>
