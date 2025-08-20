@@ -9,7 +9,7 @@ export default function HowItWorks() {
     return (
       <section id="how-it-works" className="bg-gray-100 py-20">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12">How AI Grader Works</h2>
+          <h2 className="text-3xl font-bold text-center mb-12">How DrawExplain Works</h2>
           <div className="flex flex-col md:flex-row justify-between items-center">
             {steps.map((step, index) => (
               <div key={index} className="w-full md:w-1/5 text-center mb-8 md:mb-0">

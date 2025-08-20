@@ -37,11 +37,6 @@ export default function LearnerHeader() {
               </Link>
             </li>
             <li>
-              <Link href='/about' className='text-gray-600 hover:text-blue-500'>
-                About
-              </Link>
-            </li>
-            <li>
               <Button
                 variant='outline'
                 className='text-gray-600 hover:text-blue-500 hover:bg-blue-50'

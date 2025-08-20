@@ -23,6 +23,23 @@ export default function Hero() {
           >
             Get Started
           </Button>
+          
+          {/* Demo Video */}
+          <div className="mt-12">
+            <h3 className="text-lg font-semibold mb-4">See DrawExplain in Action</h3>
+            <div className="max-w-2xl mx-auto">
+              <div style={{ position: "relative", paddingBottom: "66.66666666666666%", height: 0 }}>
+                <iframe 
+                  src="https://www.loom.com/embed/eaa97be657c649f0be08b3e26b39f6f5?sid=2d47f61d-dbb6-436f-973a-0e33f3953bf9" 
+                  frameBorder="0" 
+                  webkitallowfullscreen="true" 
+                  mozallowfullscreen="true" 
+                  allowFullScreen 
+                  style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%" }}
+                />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>

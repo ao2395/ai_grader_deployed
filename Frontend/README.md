@@ -1,4 +1,4 @@
-# 🎓 AI Grader Frontend 📚
+# 🎓 DrawExplain Frontend 📚
 
 ## Project Description
 

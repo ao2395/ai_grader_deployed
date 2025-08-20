@@ -16,7 +16,6 @@ export default function LandingPageSubheader() {
           <ul className="flex space-x-6">
             <li><a href="#features" className="text-gray-600 hover:text-blue-500">Features</a></li>
             <li><a href="#how-it-works" className="text-gray-600 hover:text-blue-500">How It Works</a></li>
-            <li><a href="#" className="text-gray-600 hover:text-blue-500">About</a></li>
             <li>
               <Link href="/signup" className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
                 Sign Up

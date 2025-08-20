@@ -1,8 +1,8 @@
-# 🎓 AI Grader: Revolutionizing Math Education 📚
+# 🎓 DrawExplain: Revolutionizing Math Education 📚
 
 ## 🌟 Project Overview
 
-AI Grader is an innovative educational platform designed to transform the way students learn and practice mathematics. By leveraging cutting-edge AI technology, our platform provides instant, personalized feedback on handwritten math solutions, helping students improve their problem-solving skills and mathematical understanding.
+DrawExplain is an innovative educational platform designed to transform the way students learn and practice mathematics. By leveraging cutting-edge AI technology, our platform provides instant, personalized feedback on handwritten math solutions, helping students improve their problem-solving skills and mathematical understanding.
 
 🔗 **Live Demo:** [drawexplain.com](https://drawexplain.com)
 
@@ -73,7 +73,7 @@ Our application uses the following main data models:
    npm run dev
 
 
-## 🖥️ How to Use AI Grader
+## 🖥️ How to Use DrawExplain
 
 1. 📝 Sign up for an account on [drawexplain.com](https://drawexplain.com)
 2. 🏋️‍♀️ Navigate to the Practice page
@@ -87,7 +87,7 @@ Our application uses the following main data models:
 
 ## 🤝 Contributing
 
-We welcome contributions to AI Grader! Please see our [CONTRIBUTING.md](CONTRIBUTING.md) file for details on how to get involved.
+We welcome contributions to DrawExplain! Please see our [CONTRIBUTING.md](CONTRIBUTING.md) file for details on how to get involved.
 
 ## 📄 License
 
@@ -100,6 +100,6 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 
 ## 📞 Contact
 
-For any questions or support, please email us at support@drawexplain.com or open an issue in this repository.
+For any questions or support, please email us at sa6097@nyu.edu or open an issue in this repository.
 
 Happy learning! 🚀📚
