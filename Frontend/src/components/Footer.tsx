@@ -10,7 +10,9 @@ export default function Footer() {
           {/* Company Info */}
           <div className="w-full md:w-1/4 mb-6 md:mb-0">
             <h3 className="text-xl font-semibold mb-4">DrawExplain</h3>
-            <p className="text-gray-400">Empowering students with AI-driven math learning.</p>
+            <p className="text-gray-600 text-center">
+              Draw it, explain it, master it
+            </p>
           </div>
           {/* Quick Links */}
           <div className="w-full md:w-1/4 mb-6 md:mb-0">
