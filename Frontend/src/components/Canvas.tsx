@@ -322,8 +322,9 @@ export default function Canvas({ currentQuestion, userId }: CanvasProps) {
 
   return (
     <div className='flex flex-col items-center w-full max-w-4xl mx-auto p-4'>
-      {isSubmitting ? (
-        <div className='flex flex-col items-center justify-center w-full max-w-4xl mx-auto p-8'>
+      {/* Loading Screen - Overlay on top of canvas */}
+      {isSubmitting && (
+        <div className='absolute inset-0 z-50 flex flex-col items-center justify-center bg-white bg-opacity-95'>
           <div className='text-center'>
             <div className='relative mb-6'>
               <div className='w-24 h-24 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto'></div>
@@ -342,37 +343,40 @@ export default function Canvas({ currentQuestion, userId }: CanvasProps) {
             </div>
           </div>
         </div>
-      ) : (
-        <>
-          <div
-            ref={containerRef}
-            className='w-full border border-gray-300 rounded-lg overflow-hidden'
-            style={{ height: "500px" }}
-          >
-            <Sketch
-              setup={setup}
-              draw={draw}
-              mousePressed={mousePressed}
-              mouseReleased={mouseReleased}
-              touchStarted={touchStarted}
-              touchEnded={touchEnded}
-            />
-          </div>
-          <div className='flex flex-wrap justify-center gap-2 mt-4'>
-            <Button onClick={switchSection} variant='secondary'>
-              {buttonText}
-            </Button>
-            <Button onClick={clearCanvas} variant='destructive'>
-              Clear Canvas
-            </Button>
-            <Button onClick={handleRecordingToggle} variant={isRecording ? "outline" : "default"}>
-              {isRecording ? "Stop Recording" : "Start Recording"}
-            </Button>
-            <br /><br /><br />
-            <SubmitButton onClick={handleSubmit} />
-          </div>
-        </>
       )}
+      
+      {/* Canvas - Always rendered but loading screen overlays it */}
+      <div className='relative w-full'>
+        <div
+          ref={containerRef}
+          className='w-full border border-gray-300 rounded-lg overflow-hidden'
+          style={{ height: "500px" }}
+        >
+          <Sketch
+            setup={setup}
+            draw={draw}
+            mousePressed={mousePressed}
+            mouseReleased={mouseReleased}
+            touchStarted={touchStarted}
+            touchEnded={touchEnded}
+          />
+        </div>
+        
+        {/* Buttons - Always visible */}
+        <div className='flex flex-wrap justify-center gap-2 mt-4'>
+          <Button onClick={switchSection} variant='secondary'>
+            {buttonText}
+          </Button>
+          <Button onClick={clearCanvas} variant='destructive'>
+            Clear Canvas
+          </Button>
+          <Button onClick={handleRecordingToggle} variant={isRecording ? "outline" : "default"}>
+            {isRecording ? "Stop Recording" : "Start Recording"}
+          </Button>
+          <br /><br /><br />
+          <SubmitButton onClick={handleSubmit} />
+        </div>
+      </div>
     </div>
   );
 }
