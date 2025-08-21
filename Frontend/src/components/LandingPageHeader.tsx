@@ -7,11 +7,16 @@ export default function LandingPageSubheader() {
     <header className="bg-white shadow-md">
       <div className="container mx-auto px-4 py-6 flex justify-between items-center">
         {/* Logo and Brand Name */}
-        <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center shadow-lg">
-            <span className="text-white font-bold text-lg">D</span>
+        <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2">
+            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+              <span className="text-white font-bold text-lg">D</span>
+            </div>
+            <div>
+              <h1 className="text-xl font-bold text-gray-900">DrawExplain</h1>
+              <p className="text-xs text-gray-600">Draw it, explain it, master it!</p>
+            </div>
           </div>
-          <span className="text-xl font-bold text-gray-800">DrawExplain</span>
         </div>
         {/* Navigation Menu */}
         <nav>
