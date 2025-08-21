@@ -111,6 +111,14 @@ export default function PracticePage() {
             <PracticePageSubheader />
             <div className='p-6'>
               <ModeToggle mode={mode} setMode={setMode} />
+              
+              {/* Brief instruction */}
+              <div className='mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg text-center'>
+                <p className='text-blue-800 text-sm font-medium'>
+                  🎙️ Press Start Recording • ✍️ Solve & explain • 🛑 Stop • 📤 Submit
+                </p>
+              </div>
+              
               {currentQuestion && (
                 <LatexQuestion
                   key={currentQuestionIndex} // Force re-render of LatexQuestion

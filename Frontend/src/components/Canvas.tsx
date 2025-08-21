@@ -322,9 +322,9 @@ export default function Canvas({ currentQuestion, userId }: CanvasProps) {
 
   return (
     <div className='flex flex-col items-center w-full max-w-4xl mx-auto p-4'>
-      {/* Loading Screen - Overlay on top of canvas */}
+      {/* Loading Screen - Full screen overlay */}
       {isSubmitting && (
-        <div className='absolute inset-0 z-50 flex flex-col items-center justify-center bg-white bg-opacity-95'>
+        <div className='fixed inset-0 z-50 flex flex-col items-center justify-center bg-white bg-opacity-95'>
           <div className='text-center'>
             <div className='relative mb-6'>
               <div className='w-24 h-24 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto'></div>
@@ -362,6 +362,14 @@ export default function Canvas({ currentQuestion, userId }: CanvasProps) {
           />
         </div>
         
+        {/* Recording Status Indicator */}
+        {isRecording && (
+          <div className='mt-4 p-3 bg-red-100 border border-red-300 rounded-lg flex items-center space-x-2'>
+            <div className='w-3 h-3 bg-red-500 rounded-full animate-pulse'></div>
+            <span className='text-red-700 font-medium'>Recording in progress...</span>
+          </div>
+        )}
+        
         {/* Buttons - Always visible */}
         <div className='flex flex-wrap justify-center gap-2 mt-4'>
           <Button onClick={switchSection} variant='secondary'>
@@ -371,7 +379,7 @@ export default function Canvas({ currentQuestion, userId }: CanvasProps) {
             Clear Canvas
           </Button>
           <Button onClick={handleRecordingToggle} variant={isRecording ? "outline" : "default"}>
-            {isRecording ? "Stop Recording" : "Start Recording"}
+            {isRecording ? "🛑 Stop Recording" : "🎙️ Start Recording"}
           </Button>
           <br /><br /><br />
           <SubmitButton onClick={handleSubmit} />
