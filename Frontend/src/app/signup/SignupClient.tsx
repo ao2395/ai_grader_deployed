@@ -9,7 +9,7 @@ const useGoogleOAuth = () => {
       if (typeof window !== "undefined") {
         // Initiate the Google OAuth flow
         window.location.href =
-          "https://backend-839795182838.us-central1.run.app/api/v1/auth/google";
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/google`;
       }
     } catch (error) {
       console.error("Error during Google login:", error);

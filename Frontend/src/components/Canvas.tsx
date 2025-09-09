@@ -194,7 +194,7 @@ export default function Canvas({ currentQuestion, userId }: CanvasProps) {
   const sendQuestionData = async (questionId: string, userId: string): Promise<FeedbackData | null> => {
     try {
       const response = await authenticatedFetch(
-        "https://backend-839795182838.us-central1.run.app/api/v1/submit/question",
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/submit/question`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -238,11 +238,11 @@ export default function Canvas({ currentQuestion, userId }: CanvasProps) {
         // Upload audio to both endpoints
         await Promise.all([
           authenticatedFetch(
-            "https://backend-839795182838.us-central1.run.app/api/v1/upload/audio",
+            `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/upload/audio`,
             { method: "POST", body: formData1 }
           ),
           authenticatedFetch(
-            "https://backend-839795182838.us-central1.run.app/api/v1/upload/research/audio",
+            `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/upload/research/audio`,
             { method: "POST", body: formData2 }
           ),
         ]);
@@ -269,11 +269,11 @@ export default function Canvas({ currentQuestion, userId }: CanvasProps) {
           // Upload image to both endpoints
           const [regularUpload, researchUpload] = await Promise.all([
             authenticatedFetch(
-              "https://backend-839795182838.us-central1.run.app/api/v1/upload/image",
+              `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/upload/image`,
               { method: "POST", body: formData1 }
             ),
             authenticatedFetch(
-              "https://backend-839795182838.us-central1.run.app/api/v1/upload/research/image",
+              `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/upload/research/image`,
               { method: "POST", body: formData2 }
             ),
           ]);

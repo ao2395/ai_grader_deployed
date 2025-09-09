@@ -41,7 +41,7 @@ export default function PracticePage() {
       try {
         setIsLoading(true);
         const response = await authenticatedFetch(
-          "https://backend-839795182838.us-central1.run.app/api/v1/questions"
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/questions`
         );
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
