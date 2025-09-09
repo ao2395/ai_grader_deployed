@@ -11,6 +11,7 @@
   "dependencies": {
     "@radix-ui/react-slot": "^1.1.0",
     "@radix-ui/react-switch": "^1.1.1",
+    "aos": "^2.3.4",
     "axios": "^1.7.7",
     "better-react-mathjax": "^2.0.4-beta1",
     "class-variance-authority": "^0.7.0",
@@ -35,6 +36,7 @@
     "util": "^0.12.5"
   },
   "devDependencies": {
+    "@types/aos": "^3.0.7",
     "@types/js-cookie": "^3.0.6",
     "@types/jwt-decode": "^3.1.0",
     "@types/katex": "^0.16.7",

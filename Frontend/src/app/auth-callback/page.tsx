@@ -30,11 +30,11 @@ const AuthCallback = () => {
           // Ensure that the token contains the necessary user information
           if (decoded && decoded.user && decoded.user.id) {
             // Set the token and userId in cookies with a 7-day expiration
-            Cookies.set("token", token, { expires: 7, secure: true, sameSite: "lax" });
-            Cookies.set("userId", decoded.user.id, { expires: 7, secure: true, sameSite: "lax" });
+            Cookies.set("token", token, { expires: 7, secure: process.env.NODE_ENV === 'production', sameSite: "lax" });
+            Cookies.set("userId", decoded.user.id, { expires: 7, secure: process.env.NODE_ENV === 'production', sameSite: "lax" });
 
-            // Redirect to the learner home page
-            router.push("/learner-home");
+            // Redirect to the practice page
+            router.push("/practice");
           } else {
             console.error("Invalid token structure.");
             // Optionally, redirect to the login page or show an error

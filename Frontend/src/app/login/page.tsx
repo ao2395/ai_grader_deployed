@@ -33,10 +33,10 @@ export default function LoginPage() {
 
       if (response.ok) {
         // Set the token and userId in cookies with a 7-day expiration
-        Cookies.set("token", data.token, { expires: 7, secure: true, sameSite: "lax" });
-        Cookies.set("userId", data.user.id, { expires: 7, secure: true, sameSite: "lax" });
+        Cookies.set("token", data.token, { expires: 7, secure: process.env.NODE_ENV === 'production', sameSite: "lax" });
+        Cookies.set("userId", data.user.id, { expires: 7, secure: process.env.NODE_ENV === 'production', sameSite: "lax" });
 
-        router.push("/learner-home");
+        router.push("/practice");
       } else {
         setError(data.message || "Login failed");
       }

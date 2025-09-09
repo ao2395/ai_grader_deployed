@@ -4,7 +4,6 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { MathJaxContext, MathJax } from "better-react-mathjax";
 import PracticePageSubheader from "@/components/PracticePageSubheader";
-import ModeToggle from "@/components/ModeToggle";
 import Canvas from "@/components/Canvas";
 import Footer from "@/components/Footer";
 import QuestionNavigation from "@/components/QuestionNavigation";
@@ -28,7 +27,6 @@ function LatexQuestion({ question }: { question: string }) {
 }
 
 export default function PracticePage() {
-  const [mode, setMode] = useState<"practice" | "exam">("practice");
   const [questions, setQuestions] = useState<QuestionData[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
@@ -110,7 +108,14 @@ export default function PracticePage() {
           <div className='max-w-4xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden'>
             <PracticePageSubheader />
             <div className='p-6'>
-              <ModeToggle mode={mode} setMode={setMode} />
+              
+              {/* Brief instruction */}
+              <div className='mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg text-center'>
+                <p className='text-blue-800 text-sm font-medium'>
+                  🎙️ Press Start Recording • ✍️ Solve & explain • 🛑 Stop • 📤 Submit
+                </p>
+              </div>
+              
               {currentQuestion && (
                 <LatexQuestion
                   key={currentQuestionIndex} // Force re-render of LatexQuestion
