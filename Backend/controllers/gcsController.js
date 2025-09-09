@@ -48,10 +48,24 @@ const { Storage } = require("@google-cloud/storage");
 const path = require("path");
 
 // const router = express.Router();
-const storage = new Storage({
-  credentials: JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON),
-});
-const bucket = storage.bucket("ai-grader-storage");
+let storage;
+let bucket;
+
+try {
+  if (!process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON) {
+    throw new Error("GOOGLE_APPLICATION_CREDENTIALS_JSON environment variable is not set");
+  }
+  
+  const credentials = JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON);
+  storage = new Storage({ credentials });
+  bucket = storage.bucket("draw-explain-storage");
+  console.log("Google Cloud Storage initialized successfully");
+} catch (error) {
+  console.error("Failed to initialize Google Cloud Storage:", error.message);
+  // Create a mock storage for development/testing
+  storage = null;
+  bucket = null;
+}
 
 // Multer configuration for memory storage
 const upload = multer({
@@ -66,6 +80,13 @@ async function uploadToGCS(file, res) {
       return res.status(400).send("No file uploaded.");
     }
 
+    if (!storage || !bucket) {
+      console.error("Google Cloud Storage not initialized");
+      return res.status(500).send({ 
+        message: "Google Cloud Storage not configured. Please check GOOGLE_APPLICATION_CREDENTIALS_JSON environment variable." 
+      });
+    }
+
     const blob = bucket.file(file.originalname);
     const blobStream = blob.createWriteStream({
       resumable: false,
@@ -73,16 +94,19 @@ async function uploadToGCS(file, res) {
     });
 
     blobStream.on("error", (err) => {
+      console.error("GCS upload error:", err);
       res.status(500).send({ message: err.message });
     });
 
     blobStream.on("finish", () => {
       const publicUrl = `https://storage.googleapis.com/${bucket.name}/${blob.name}`;
+      console.log("File uploaded successfully:", publicUrl);
       res.status(200).send({ publicUrl });
     });
 
     blobStream.end(file.buffer);
   } catch (error) {
+    console.error("Upload error:", error);
     res.status(500).send({ message: error.message });
   }
 }
