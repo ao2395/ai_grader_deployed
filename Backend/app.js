@@ -21,11 +21,32 @@ app.set("trust proxy", true);
 // Middlewares
 app.use(helmet());
 
+// Fallback CORS configuration (always applied)
+app.use(cors({
+  origin: [
+    'http://localhost:3001',
+    'https://ai-grader-deployed-frontend-155657669630.europe-west1.run.app',
+    'https://drawexplain.com'
+  ],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin']
+}));
+
 if (process.env.NODE_ENV !== "deployment") {
   app.use(morgan("dev"));
   app.use(cors({ origin: `http://localhost:3001`, credentials: true }));
 } else {
-  app.use(cors({ origin: [process.env.FRONTEND_URL || 'https://ai-grader-deployed-frontend-155657669630.europe-west1.run.app', `https://drawexplain.com`], credentials: true }));
+  // More explicit CORS configuration for production
+  app.use(cors({ 
+    origin: [
+      'https://ai-grader-deployed-frontend-155657669630.europe-west1.run.app',
+      'https://drawexplain.com'
+    ], 
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin']
+  }));
   const limiter = rateLimit({
     max: 200,
     windowMs: 3 * 60 * 1000,
