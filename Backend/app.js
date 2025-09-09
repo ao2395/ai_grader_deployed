@@ -26,7 +26,8 @@ app.use(cors({
   origin: [
     'http://localhost:3001',
     'https://ai-grader-deployed-frontend-155657669630.europe-west1.run.app',
-    'https://drawexplain.com'
+    'https://drawexplain.com',
+    'https://www.drawexplain.com'
   ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -41,7 +42,8 @@ if (process.env.NODE_ENV !== "deployment") {
   app.use(cors({ 
     origin: [
       'https://ai-grader-deployed-frontend-155657669630.europe-west1.run.app',
-      'https://drawexplain.com'
+      'https://drawexplain.com',
+      'https://www.drawexplain.com'
     ], 
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
